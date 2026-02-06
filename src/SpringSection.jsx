@@ -17,7 +17,7 @@ const SpringSection = () => {
 
   useLayoutEffect(() => {
     const ctx = gsap.context(() => {
-      // --- 1. DRAMATIC FADE TRANSITION ---
+      // 1. FADE TRANSITION (unchanged)
       gsap.fromTo(
         fadeOverlayRef.current,
         { opacity: 1 },
@@ -32,25 +32,8 @@ const SpringSection = () => {
         }
       );
 
-      // --- 2. CONTINUOUS BLOB ANIMATION ---
+      // 2. LIGHTER BLOBS (reduced complexity)
       blobsRef.current.forEach((blob, index) => {
-        const tl = gsap.timeline({ repeat: -1 });
-        tl.to(blob, {
-          borderRadius: "45% 55% 60% 40% / 55% 45% 40% 60%",
-          duration: 6,
-          ease: "sine.inOut",
-        })
-        .to(blob, {
-          borderRadius: "55% 45% 50% 50% / 60% 40% 55% 45%",
-          duration: 6,
-          ease: "sine.inOut",
-        })
-        .to(blob, {
-          borderRadius: "50% 50% 45% 55% / 45% 55% 60% 40%",
-          duration: 6,
-          ease: "sine.inOut",
-        });
-
         gsap.to(blob, {
           scale: 1.12,
           duration: 7,
@@ -59,71 +42,31 @@ const SpringSection = () => {
           ease: "power1.inOut",
           delay: index * 1,
         });
-
-        gsap.to(blob, {
-          x: `+=${gsap.utils.random(-40, 40)}`,
-          y: `+=${gsap.utils.random(-30, 30)}`,
-          duration: 10,
-          repeat: -1,
-          yoyo: true,
-          ease: "sine.inOut",
-          delay: index * 0.5,
-        });
       });
 
-      // --- 3. CONTINUOUS CHERRY BLOSSOM PETALS ---
+      // 3. SIMPLE PETALS LIKE OVERLAYMENU (8 petals only)
       petalsRef.current.forEach((petal, index) => {
-        const startX = gsap.utils.random(-100, window.innerWidth + 100);
-        const startY = gsap.utils.random(-200, -50);
-        
         gsap.set(petal, {
-          x: startX,
-          y: startY,
+          x: gsap.utils.random(0, window.innerWidth),
+          y: -50,
           rotation: gsap.utils.random(0, 360),
-          scale: gsap.utils.random(0.7, 1.6),
-          opacity: 0,
-        });
-
-        const fallAnimation = gsap.timeline({ repeat: -1, delay: gsap.utils.random(0, 12) });
-        
-        fallAnimation.to(petal, {
-          opacity: gsap.utils.random(0.7, 1),
-          duration: 1,
-          ease: "power1.in",
-        });
-        
-        fallAnimation.to(petal, {
-          y: window.innerHeight + 150,
-          x: `+=${gsap.utils.random(-400, 400)}`,
-          rotation: `+=${gsap.utils.random(360, 1080)}`,
-          duration: gsap.utils.random(15, 25),
-          ease: "sine.inOut",
-        }, "-=0.5");
-        
-        fallAnimation.to(petal, {
-          opacity: 0,
-          duration: 2,
-          ease: "power1.out",
-        }, "-=3");
-        
-        fallAnimation.set(petal, {
-          y: gsap.utils.random(-200, -50),
-          x: gsap.utils.random(-100, window.innerWidth + 100),
-          rotation: gsap.utils.random(0, 360),
+          scale: gsap.utils.random(0.5, 1.5),
+          opacity: gsap.utils.random(0.3, 0.8),
         });
 
         gsap.to(petal, {
-          x: `+=${gsap.utils.random(-150, 150)}`,
-          duration: gsap.utils.random(4, 7),
+          y: window.innerHeight + 100,
+          x: "+=100",
+          rotation: 360,
+          duration: gsap.utils.random(3, 8),
+          ease: "none",
           repeat: -1,
-          yoyo: true,
-          ease: "sine.inOut",
-          delay: gsap.utils.random(0, 3),
+          delay: gsap.utils.random(0, 5),
+          overwrite: true,
         });
       });
 
-      // --- 4. DELAYED TEXT ANIMATIONS ---
-      
+      // 4. TEXT ANIMATIONS (unchanged)
       gsap.fromTo(
         decorLineLeftRef.current,
         { scaleX: 0, opacity: 0 },
@@ -159,12 +102,7 @@ const SpringSection = () => {
 
       gsap.fromTo(
         titleRef.current,
-        { 
-          x: -200, 
-          opacity: 0, 
-          scale: 0.7,
-          rotationY: -30,
-        },
+        { x: -200, opacity: 0, scale: 0.7, rotationY: -30 },
         {
           x: 0,
           opacity: 1,
@@ -183,11 +121,7 @@ const SpringSection = () => {
 
       gsap.fromTo(
         subtitleRef.current,
-        { 
-          x: 200, 
-          opacity: 0,
-          filter: "blur(15px)",
-        },
+        { x: 200, opacity: 0, filter: "blur(15px)" },
         {
           x: 0,
           opacity: 1,
@@ -205,12 +139,7 @@ const SpringSection = () => {
 
       gsap.fromTo(
         cardRef.current,
-        { 
-          scale: 0.5, 
-          opacity: 0, 
-          y: 100,
-          rotationX: 45,
-        },
+        { scale: 0.5, opacity: 0, y: 100, rotationX: 45 },
         {
           scale: 1,
           opacity: 1,
@@ -241,324 +170,47 @@ const SpringSection = () => {
   }, []);
 
   return (
-    <div
-      ref={sectionRef}
-      className="relative w-full h-screen overflow-hidden"
-    >
-      {/* --- BASE BACKGROUND --- */}
+    <div ref={sectionRef} className="relative w-full h-screen overflow-hidden">
+      {/* BASE BACKGROUND */}
       <div className="absolute inset-0 bg-gradient-to-br from-[#fce4ec] via-[#f8bbd0] to-[#f48fb1] -z-10"></div>
 
-      {/* --- FADE OVERLAY --- */}
+      {/* FADE OVERLAY */}
       <div
         ref={fadeOverlayRef}
         className="absolute inset-0 bg-gradient-to-b from-[#1a0b2e] via-[#2e1a3e] to-[#1a0b2e] z-10 pointer-events-none"
       ></div>
 
-      {/* --- ORGANIC BLOBS --- */}
+      {/* LIGHTER BLOBS (same positions, reduced effects) */}
       <div className="absolute inset-0 z-0">
         <div
           ref={(el) => (blobsRef.current[0] = el)}
-          className="absolute top-[10%] left-[5%] w-[450px] h-[450px] rounded-full bg-gradient-to-br from-[#f8bbd0]/50 via-[#f06292]/30 to-transparent blur-[100px]"
+          className="absolute top-[10%] left-[5%] w-[450px] h-[450px] rounded-full bg-gradient-to-br from-[#f8bbd0]/30 to-transparent blur-[60px]"
         ></div>
         <div
           ref={(el) => (blobsRef.current[1] = el)}
-          className="absolute top-[50%] right-[10%] w-[500px] h-[500px] rounded-full bg-gradient-to-br from-[#ffccbc]/60 via-[#ff8a65]/40 to-transparent blur-[110px]"
+          className="absolute top-[50%] right-[10%] w-[500px] h-[500px] rounded-full bg-gradient-to-br from-[#ffccbc]/40 to-transparent blur-[70px]"
         ></div>
         <div
           ref={(el) => (blobsRef.current[2] = el)}
-          className="absolute bottom-[5%] left-[40%] w-[420px] h-[420px] rounded-full bg-gradient-to-br from-[#e1bee7]/55 via-[#ce93d8]/35 to-transparent blur-[95px]"
+          className="absolute bottom-[5%] left-[40%] w-[420px] h-[420px] rounded-full bg-gradient-to-br from-[#e1bee7]/30 to-transparent blur-[55px]"
         ></div>
       </div>
 
-      {/* --- ULTRA-REALISTIC CHERRY BLOSSOMS --- */}
+      {/* SIMPLE CHERRY BLOSSOMS LIKE OVERLAYMENU (8 petals) */}
       <div className="absolute inset-0 z-5 pointer-events-none">
-        {[...Array(50)].map((_, i) => (
-          <svg
+        {[...Array(8)].map((_, i) => (
+          <div
             key={i}
             ref={(el) => (petalsRef.current[i] = el)}
-            width="50"
-            height="50"
-            viewBox="0 0 200 200"
-            className="absolute"
+            className="absolute top-0 left-0 w-4 h-4 bg-[#FF007A] opacity-0 pointer-events-none shadow-[0_0_10px_#FF007A]"
             style={{ 
-              filter: 'drop-shadow(0 4px 8px rgba(244, 143, 177, 0.4)) drop-shadow(0 2px 3px rgba(255, 182, 193, 0.3))',
-              willChange: 'transform, opacity',
+              clipPath: 'polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)',
             }}
-          >
-            <defs>
-              {/* Multi-stop gradient for realistic color */}
-              <radialGradient id={`mainGrad${i}`} cx="50%" cy="70%" r="65%">
-                <stop offset="0%" stopColor="#ffffff" stopOpacity="0.95" />
-                <stop offset="25%" stopColor="#ffe8f5" stopOpacity="0.95" />
-                <stop offset="50%" stopColor="#ffd6ec" stopOpacity="0.92" />
-                <stop offset="75%" stopColor="#ffc1e3" stopOpacity="0.88" />
-                <stop offset="100%" stopColor="#ffb3d9" stopOpacity="0.8" />
-              </radialGradient>
-
-              {/* Base pink gradient */}
-              <radialGradient id={`baseGrad${i}`} cx="50%" cy="50%" r="50%">
-                <stop offset="0%" stopColor="#f48fb1" stopOpacity="0.5" />
-                <stop offset="50%" stopColor="#f8bbd0" stopOpacity="0.3" />
-                <stop offset="100%" stopColor="transparent" stopOpacity="0" />
-              </radialGradient>
-
-              {/* Petal vein gradient */}
-              <linearGradient id={`veinGrad${i}`} x1="0%" y1="0%" x2="0%" y2="100%">
-                <stop offset="0%" stopColor="#f48fb1" stopOpacity="0.25" />
-                <stop offset="100%" stopColor="#f06292" stopOpacity="0.1" />
-              </linearGradient>
-
-              {/* Edge shine */}
-              <linearGradient id={`edgeShine${i}`} x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stopColor="transparent" stopOpacity="0" />
-                <stop offset="50%" stopColor="#ffffff" stopOpacity="0.6" />
-                <stop offset="100%" stopColor="transparent" stopOpacity="0" />
-              </linearGradient>
-
-              {/* Inner shadow for depth */}
-              <filter id={`innerShadow${i}`} x="-50%" y="-50%" width="200%" height="200%">
-                <feGaussianBlur in="SourceAlpha" stdDeviation="3"/>
-                <feOffset dx="0" dy="2" result="offsetblur"/>
-                <feFlood floodColor="#f06292" floodOpacity="0.15"/>
-                <feComposite in2="offsetblur" operator="in"/>
-                <feMerge>
-                  <feMergeNode/>
-                  <feMergeNode in="SourceGraphic"/>
-                </feMerge>
-              </filter>
-
-              {/* Soft glow */}
-              <filter id={`softGlow${i}`}>
-                <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
-                <feMerge>
-                  <feMergeNode in="coloredBlur"/>
-                  <feMergeNode in="SourceGraphic"/>
-                </feMerge>
-              </filter>
-            </defs>
-
-            {/* Five authentic cherry blossom petals */}
-            {[0, 72, 144, 216, 288].map((angle, petalIdx) => (
-              <g key={petalIdx} transform={`rotate(${angle} 100 100)`}>
-                {/* Petal base shadow */}
-                <ellipse
-                  cx="100"
-                  cy="120"
-                  rx="18"
-                  ry="12"
-                  fill="rgba(236, 64, 122, 0.12)"
-                  transform="translate(1, 2)"
-                  filter="blur(3px)"
-                />
-
-                {/* Main petal body with authentic shape */}
-                <path
-                  d="M 100 100
-                     C 90 90, 85 70, 88 50
-                     C 90 35, 95 25, 97 20
-                     C 98 17, 99 15, 99.5 13
-                     L 98 11
-                     C 98.5 10, 99 9.5, 99.5 9
-                     C 99.7 8.7, 99.9 8.5, 100 8.5
-                     C 100.1 8.5, 100.3 8.7, 100.5 9
-                     C 101 9.5, 101.5 10, 102 11
-                     L 100.5 13
-                     C 101 15, 102 17, 103 20
-                     C 105 25, 110 35, 112 50
-                     C 115 70, 110 90, 100 100 Z"
-                  fill={`url(#mainGrad${i})`}
-                  filter={`url(#innerShadow${i})`}
-                  opacity="0.92"
-                />
-
-                {/* Petal shine/highlight along edge */}
-                <path
-                  d="M 100 100 C 92 88, 87 68, 89 50 C 90.5 38, 94 28, 96 22"
-                  fill="none"
-                  stroke={`url(#edgeShine${i})`}
-                  strokeWidth="2"
-                  opacity="0.7"
-                />
-
-                {/* Opposite edge highlight */}
-                <path
-                  d="M 100 100 C 108 88, 113 68, 111 50 C 109.5 38, 106 28, 104 22"
-                  fill="none"
-                  stroke={`url(#edgeShine${i})`}
-                  strokeWidth="2"
-                  opacity="0.6"
-                />
-
-                {/* Central vein (primary) */}
-                <line
-                  x1="100" y1="100"
-                  x2="100" y2="15"
-                  stroke={`url(#veinGrad${i})`}
-                  strokeWidth="1"
-                  strokeLinecap="round"
-                  opacity="0.5"
-                />
-
-                {/* Branch veins (left side) */}
-                <path
-                  d="M 100 70 Q 94 60, 92 48"
-                  fill="none"
-                  stroke="rgba(236, 64, 122, 0.15)"
-                  strokeWidth="0.6"
-                />
-                <path
-                  d="M 100 55 Q 96 48, 95 38"
-                  fill="none"
-                  stroke="rgba(236, 64, 122, 0.12)"
-                  strokeWidth="0.5"
-                />
-                <path
-                  d="M 100 40 Q 97 35, 96 28"
-                  fill="none"
-                  stroke="rgba(236, 64, 122, 0.1)"
-                  strokeWidth="0.4"
-                />
-
-                {/* Branch veins (right side) */}
-                <path
-                  d="M 100 70 Q 106 60, 108 48"
-                  fill="none"
-                  stroke="rgba(236, 64, 122, 0.15)"
-                  strokeWidth="0.6"
-                />
-                <path
-                  d="M 100 55 Q 104 48, 105 38"
-                  fill="none"
-                  stroke="rgba(236, 64, 122, 0.12)"
-                  strokeWidth="0.5"
-                />
-                <path
-                  d="M 100 40 Q 103 35, 104 28"
-                  fill="none"
-                  stroke="rgba(236, 64, 122, 0.1)"
-                  strokeWidth="0.4"
-                />
-
-                {/* Characteristic notch at petal tip */}
-                <path
-                  d="M 98.5 11 Q 99.5 9.5, 100 8.5 Q 100.5 9.5, 101.5 11"
-                  fill="rgba(255, 182, 193, 0.4)"
-                  stroke="rgba(244, 143, 177, 0.3)"
-                  strokeWidth="0.5"
-                />
-
-                {/* Delicate tip detail */}
-                <circle
-                  cx="100"
-                  cy="10"
-                  r="1.5"
-                  fill="rgba(255, 192, 203, 0.5)"
-                />
-
-                {/* Petal texture (subtle spots) */}
-                <circle cx="95" cy="50" r="1" fill="rgba(255, 182, 193, 0.2)"/>
-                <circle cx="105" cy="45" r="0.8" fill="rgba(255, 182, 193, 0.15)"/>
-                <circle cx="98" cy="35" r="0.7" fill="rgba(255, 182, 193, 0.18)"/>
-              </g>
-            ))}
-
-            {/* Flower center base */}
-            <circle
-              cx="100"
-              cy="100"
-              r="18"
-              fill={`url(#baseGrad${i})`}
-            />
-
-            {/* Receptacle (green center base) */}
-            <circle
-              cx="100"
-              cy="100"
-              r="10"
-              fill="rgba(139, 195, 74, 0.3)"
-              stroke="rgba(104, 159, 56, 0.2)"
-              strokeWidth="0.5"
-            />
-
-            {/* Stamen cluster (authentic arrangement) */}
-            <g filter={`url(#softGlow${i})`}>
-              {/* Long stamen with anthers */}
-              {[0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330].map((angle, idx) => {
-                const length = 8 + Math.random() * 4;
-                const x = 100 + length * Math.cos(angle * Math.PI / 180);
-                const y = 100 + length * Math.sin(angle * Math.PI / 180);
-                return (
-                  <g key={idx}>
-                    {/* Stamen filament */}
-                    <line
-                      x1="100"
-                      y1="100"
-                      x2={x}
-                      y2={y}
-                      stroke="rgba(255, 255, 255, 0.6)"
-                      strokeWidth="0.5"
-                    />
-                    {/* Anther (pollen sac) */}
-                    <ellipse
-                      cx={x}
-                      cy={y}
-                      rx="1.2"
-                      ry="1.8"
-                      fill="#fff59d"
-                      opacity="0.9"
-                      transform={`rotate(${angle} ${x} ${y})`}
-                    />
-                    {/* Pollen grains */}
-                    <circle
-                      cx={x}
-                      cy={y}
-                      r="0.4"
-                      fill="#ffeb3b"
-                      opacity="0.8"
-                    />
-                  </g>
-                );
-              })}
-
-              {/* Central pistil */}
-              <circle
-                cx="100"
-                cy="100"
-                r="4"
-                fill="#ec407a"
-                opacity="0.7"
-              />
-              <circle
-                cx="100"
-                cy="100"
-                r="3"
-                fill="#f48fb1"
-                opacity="0.8"
-              />
-              <circle
-                cx="99"
-                cy="99"
-                r="1.5"
-                fill="#ffffff"
-                opacity="0.9"
-              />
-            </g>
-
-            {/* Outer subtle glow */}
-            <circle
-              cx="100"
-              cy="100"
-              r="88"
-              fill="none"
-              stroke="rgba(255, 255, 255, 0.2)"
-              strokeWidth="1"
-              opacity="0.5"
-            />
-          </svg>
+          />
         ))}
       </div>
 
-      {/* --- CONTENT --- */}
+      {/* CONTENT (unchanged) */}
       <div className="relative z-20 flex flex-col items-center justify-center h-full px-8 text-center">
         <div className="flex items-center gap-6 mb-8">
           <div
@@ -616,30 +268,13 @@ const SpringSection = () => {
         </div>
       </div>
 
-      {/* --- SOFT LIGHT GRADIENT --- */}
+      {/* LIGHT GRADIENT */}
       <div
-        className="absolute inset-0 z-[1] pointer-events-none opacity-30"
+        className="absolute inset-0 z-[1] pointer-events-none opacity-20"
         style={{
-          background: 'radial-gradient(ellipse at 50% 30%, rgba(255,255,255,0.5) 0%, transparent 60%)',
+          background: 'radial-gradient(ellipse at 50% 30%, rgba(255,255,255,0.3) 0%, transparent 60%)',
         }}
       ></div>
-
-      {/* --- FLOATING PARTICLES --- */}
-      <div className="absolute inset-0 z-[3] pointer-events-none">
-        {[...Array(20)].map((_, i) => (
-          <div
-            key={`particle-${i}`}
-            className="absolute w-1 h-1 rounded-full bg-pink-300/60"
-            style={{
-              top: `${Math.random() * 100}%`,
-              left: `${Math.random() * 100}%`,
-              animation: `float ${3 + Math.random() * 3}s ease-in-out infinite`,
-              animationDelay: `${Math.random() * 3}s`,
-              boxShadow: '0 0 8px rgba(236, 64, 122, 0.5)',
-            }}
-          ></div>
-        ))}
-      </div>
 
       <style jsx>{`
         @keyframes float {
