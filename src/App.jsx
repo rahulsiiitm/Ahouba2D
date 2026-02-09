@@ -1,221 +1,123 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useCallback, memo } from 'react';
 import Navbar from './NavBar';
 import GlitchMenu from './GlitchMenu';
 import OverlayMenu from './OverlayMenu';
-import BackgroundText from './backgroundText.jsx';
 import SpringSection from './SpringSection.jsx';
 import SummerSection from './SummerSection.jsx';
 import AutumnSection from './AutumnSection.jsx';
-import SecondSection from './SecondSection.jsx';  // ✅ ADD THIS
+import SecondSection from './SecondSection.jsx';
 import CircleRevealTransition from './PageTransition.jsx';
 import goku from "./assets/Frame3.jpg";
 
+const fixedPageStyle = {
+  position: 'fixed',
+  inset: 0,
+  width: '100%',
+  height: '100vh',
+  willChange: 'opacity, transform',
+  transform: 'translateZ(0)',
+  backfaceVisibility: 'hidden',
+};
+
+const GokuPage = memo(({ sectionRef }) => (
+  <div ref={sectionRef} style={{ ...fixedPageStyle, zIndex: 10, opacity: 1 }}>
+    <img 
+      src={goku} 
+      alt="Goku" 
+      className="absolute inset-0 w-full h-full object-cover" 
+      style={{ filter: 'sepia(0.2) hue-rotate(280deg) saturate(0.7) brightness(0.88)' }}
+      loading="eager" 
+    />
+    <div className="absolute inset-0 bg-blue-600/30 mix-blend-screen pointer-events-none" />
+    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20 pointer-events-none" />
+  </div>
+));
+
+const SpacePage = memo(({ sectionRef, parent }) => (
+  <div ref={sectionRef} style={{ ...fixedPageStyle, zIndex: 8, opacity: 1 }}>
+    <SecondSection father={parent} />
+  </div>
+));
+
+const PageWrapper = memo(({ sectionRef, children }) => (
+  <div ref={sectionRef} style={{ ...fixedPageStyle, zIndex: 1, opacity: 0 }}>
+    {children}
+  </div>
+));
+
 function App() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  
   const PARENT = useRef(null);
 
-  // Transition trigger refs (ONLY 4 TRANSITIONS NOW)
-  const transition1Ref = useRef(null);
-  const transition2Ref = useRef(null);
-  const transition3Ref = useRef(null);
-  const transition4Ref = useRef(null);
-  
-  // Fixed page refs (ONLY 5 PAGES NOW)
-  const gokuSectionRef = useRef(null);
-  const spaceSectionRef = useRef(null);
-  const springSectionRef = useRef(null);
-  const summerSectionRef = useRef(null);
-  const autumnSectionRef = useRef(null);
- 
-  const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen);
+  const transitionRefs = {
+    t1: useRef(null), t2: useRef(null), t3: useRef(null), t4: useRef(null),
   };
 
-  const closeMenu = () => {
-    setIsMenuOpen(false);
+  const sectionRefs = {
+    goku: useRef(null), space: useRef(null),
+    spring: useRef(null), summer: useRef(null), autumn: useRef(null),
   };
+
+  const toggleMenu = useCallback(() => setIsMenuOpen(v => !v), []);
+  const closeMenu = useCallback(() => setIsMenuOpen(false), []);
 
   return (
     <>
-      {/* SCROLL CONTAINER - REDUCED HEIGHT (5 pages, 4 transitions) */}
-      <div className="relative w-full" style={{ height: '1100vh' }} ref={PARENT}>
-        {/* Page 1 viewing area (100vh) */}
-        <div className="h-screen" />
+      {/* SCROLLABLE TRACK - 2600vh total height for ultra-smooth pacing */}
+      <div ref={PARENT} className="relative w-full" style={{ height: '2600vh' }}>
+        <div className="h-screen" /> 
         
-        {/* Gap before transition (50vh) */}
-        <div style={{ height: '50vh' }} />
-        
-        {/* Transition 1→2 (100vh) */}
-        <div id="transition1-trigger" ref={transition1Ref} className="h-[300vh]" />
+        {/* T1: Goku -> Space */}
+        <div ref={transitionRefs.t1} className="h-[300vh]" />
 
+        {/* SPACE ANIMATION ZONE 
+            DOUBLED to 1400vh to slow down card entry significantly 
+        */}
+        <div id="space-trigger" className="h-[2160vh] bg-transparent" />
+
+        {/* Following Seasons - Spaced out for the new scale */}
+        <div ref={transitionRefs.t2} className="h-[300vh]" />
+        <div ref={transitionRefs.t3} className="h-[300vh]" />
+        <div ref={transitionRefs.t4} className="h-[300vh]" />
         
-        {/* Gap after transition (50vh) */}
-        <div style={{ height: '450vh' }} />
-        
-        {/* Page 2 viewing area (100vh) */}
-        <div className="h-screen" />
-        
-        {/* Gap before transition (50vh) */}
-        <div style={{ height: '50vh' }} />
-        
-        {/* Transition 2→3 (100vh) */}
-        <div ref={transition2Ref} className="h-[300vh]" />
-        
-        {/* Gap after transition (50vh) */}
-        <div style={{ height: '50vh' }} />
-        
-        {/* Page 3 viewing area (100vh) */}
-        <div className="h-screen" />
-        
-        {/* Gap before transition (50vh) */}
-        <div style={{ height: '50vh' }} />
-        
-        {/* Transition 3→4 (100vh) */}
-        <div ref={transition3Ref} className="h-[300vh]" />
-        
-        {/* Gap after transition (50vh) */}
-        <div style={{ height: '50vh' }} />
-        
-        {/* Page 4 viewing area (100vh) */}
-        <div className="h-screen" />
-        
-        {/* Gap before transition (50vh) */}
-        <div style={{ height: '50vh' }} />
-        
-        {/* Transition 4→5 (100vh) */}
-        <div ref={transition4Ref} className="h-[300vh]" />
-        
-        {/* Gap after transition (50vh) */}
-        <div style={{ height: '50vh' }} />
-        
-        {/* Page 5 viewing area (100vh) */}
-        <div className="h-screen" />
+        <div className="h-screen" /> 
       </div>
 
-      {/* FIXED PAGES */}
-      <div className="fixed inset-0 w-full h-screen overflow-hidden">
-        
-        {/* NAVBAR + MENU BUTTON */}
-        <div className="fixed top-0 left-0 right-0 z-[1000]">
-         <Navbar toggleMenu={toggleMenu} />
-         <GlitchMenu onClick={toggleMenu} isOpen={isMenuOpen} />
+      <div className="fixed inset-0 w-full h-screen overflow-hidden pointer-events-none">
+        <div className="fixed top-0 left-0 right-0 z-[1000] pointer-events-auto">
+          <Navbar toggleMenu={toggleMenu} />
+          <GlitchMenu onClick={toggleMenu} isOpen={isMenuOpen} />
         </div>
-        
-        {/* OVERLAY MENU - FIXED PROP NAME */}
         <OverlayMenu isOpen={isMenuOpen} closeMenu={closeMenu} />
 
-        {/* PAGE 1: GOKU */}
-        <div 
-          ref={gokuSectionRef} 
-          className="fixed inset-0 w-full h-screen"
-          style={{ zIndex: 10, opacity: 1 }}
-        >
-          <BackgroundText />
-          <img 
-  src={goku} 
-  alt="Goku" 
-  className="absolute inset-0 w-full h-full w-20 object-cover "
-  style={{ 
-    filter: 'sepia(0.2) hue-rotate(280deg) saturate(0.7) brightness(0.88)'
-  }}
-/>
-
-        </div>
-
-       {/* PAGE 2: SecondSection (Eva + Gundam + Slabs) */}
-<div ref={spaceSectionRef} className="fixed inset-0 w-full h-screen" style={{ zIndex: 8, opacity: 1 }}>
-  <SecondSection father={PARENT} />  {/* ✅ USE SecondSection */}
-</div>
-
-
-        {/* PAGE 3: SPRING */}
-        <div 
-          ref={springSectionRef} 
-          className="fixed inset-0 w-full h-screen"
-          style={{ zIndex: 1, opacity: 0 }}
-        >
-          <SpringSection />
-        </div>
-
-        {/* PAGE 4: SUMMER */}
-        <div 
-          ref={summerSectionRef} 
-          className="fixed inset-0 w-full h-screen"
-          style={{ zIndex: 1, opacity: 0 }}
-        >
-          <SummerSection />
-        </div>
-
-        {/* PAGE 5: AUTUMN (FINAL PAGE) */}
-        <div 
-          ref={autumnSectionRef} 
-          className="fixed inset-0 w-full h-screen"
-          style={{ zIndex: 1, opacity: 0 }}
-        >
-          <AutumnSection />
-        </div>
-
-        {/* ===== TRANSITIONS (ONLY 4) ===== */}
+        <GokuPage sectionRef={sectionRefs.goku} />
+        <SpacePage sectionRef={sectionRefs.space} parent={PARENT} />
         
-        {/* Transition 1→2: TOP-LEFT */}
-        <CircleRevealTransition 
-          color1="#f06292" 
-          color2="#1a0b2e" 
-          triggerRef={transition1Ref}
-          currentSectionRef={gokuSectionRef}
-          nextSectionRef={spaceSectionRef}
+        <PageWrapper sectionRef={sectionRefs.spring}><SpringSection /></PageWrapper>
+        <PageWrapper sectionRef={sectionRefs.summer}><SummerSection /></PageWrapper>
+        <PageWrapper sectionRef={sectionRefs.autumn}><AutumnSection /></PageWrapper>
+
+        <CircleRevealTransition
+          color1="#f06292" triggerRef={transitionRefs.t1}
+          currentSectionRef={sectionRefs.goku} nextSectionRef={sectionRefs.space}
           originPosition="top-left"
-          isDual={false}
-          delay={0.25}
-          onComplete={() => {
-                window.dispatchEvent(new CustomEvent('incomingSecond'));
-  }}
         />
-
-        {/* Transition 2→3: BOTTOM-RIGHT */}
-        <CircleRevealTransition 
-          color1="#2e1a3e" 
-          color2="#fce4ec" 
-          triggerRef={transition2Ref}
-          currentSectionRef={spaceSectionRef}
-          nextSectionRef={springSectionRef}
+        <CircleRevealTransition
+          color1="#2e1a3e" triggerRef={transitionRefs.t2}
+          currentSectionRef={sectionRefs.space} nextSectionRef={sectionRefs.spring}
           originPosition="bottom-right"
-          isDual={false}
-          delay={0.25}
         />
-
-        {/* Transition 3→4: TOP-RIGHT */}
-        <CircleRevealTransition 
-          color1="#f8bbd0" 
-          color2="#fff9e6" 
-          triggerRef={transition3Ref}
-          currentSectionRef={springSectionRef}
-          nextSectionRef={summerSectionRef}
+        <CircleRevealTransition
+          color1="#f8bbd0" triggerRef={transitionRefs.t3}
+          currentSectionRef={sectionRefs.spring} nextSectionRef={sectionRefs.summer}
           originPosition="top-right"
-          isDual={false}
-          delay={0.25}
         />
-
-        {/* Transition 4→5: BOTTOM-LEFT */}
-        <CircleRevealTransition 
-          color1="#ffe0b2" 
-          color2="#d7ccc8" 
-          triggerRef={transition4Ref}
-          currentSectionRef={summerSectionRef}
-          nextSectionRef={autumnSectionRef}
+        <CircleRevealTransition
+          color1="#ffe0b2" triggerRef={transitionRefs.t4}
+          currentSectionRef={sectionRefs.summer} nextSectionRef={sectionRefs.autumn}
           originPosition="bottom-left"
-          isDual={false}
-          delay={0.25}
         />
       </div>
-
-      <style jsx>{`
-        @keyframes twinkle {
-         0%, 100% { opacity: 0.3; transform: scale(1); }
-         50% { opacity: 1; transform: scale(1.5); }
-        }
-      `}</style>
     </>
   );
 }
