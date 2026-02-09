@@ -279,7 +279,7 @@ to-[#8E1459] -z-10"></div>
         }}
       ></div>
 
-      <style jsx>{`
+      <style jsx="true">{`
         @keyframes float {
           0%, 100% { transform: translateY(0px); }
           50% { transform: translateY(-20px); }

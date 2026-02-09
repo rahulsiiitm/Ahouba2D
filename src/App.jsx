@@ -63,19 +63,17 @@ function App() {
 
   return (
     <>
-      {/* SCROLLABLE TRACK - 2600vh total height for ultra-smooth pacing */}
+      {/* SCROLLABLE TRACK */}
       <div ref={PARENT} className="relative w-full" style={{ height: '2600vh' }}>
         <div className="h-screen" /> 
         
         {/* T1: Goku -> Space */}
         <div ref={transitionRefs.t1} className="h-[300vh]" />
 
-        {/* SPACE ANIMATION ZONE 
-            DOUBLED to 1400vh to slow down card entry significantly 
-        */}
+        {/* SPACE ANIMATION ZONE */}
         <div id="space-trigger" className="h-[2160vh] bg-transparent" />
 
-        {/* Following Seasons - Spaced out for the new scale */}
+        {/* Following Seasons */}
         <div ref={transitionRefs.t2} className="h-[300vh]" />
         <div ref={transitionRefs.t3} className="h-[300vh]" />
         <div ref={transitionRefs.t4} className="h-[300vh]" />
@@ -84,11 +82,17 @@ function App() {
       </div>
 
       <div className="fixed inset-0 w-full h-screen overflow-hidden pointer-events-none">
+        
+        {/* UI LAYER (Navbar + Menu) - Interactive */}
         <div className="fixed top-0 left-0 right-0 z-[1000] pointer-events-auto">
           <Navbar toggleMenu={toggleMenu} />
           <GlitchMenu onClick={toggleMenu} isOpen={isMenuOpen} />
         </div>
-        <OverlayMenu isOpen={isMenuOpen} closeMenu={closeMenu} />
+
+        {/* FIX: Wrap OverlayMenu in pointer-events-auto to restore hover/clicks */}
+        <div className="pointer-events-auto">
+           <OverlayMenu isOpen={isMenuOpen} closeMenu={closeMenu} />
+        </div>
 
         <GokuPage sectionRef={sectionRefs.goku} />
         <SpacePage sectionRef={sectionRefs.space} parent={PARENT} />
