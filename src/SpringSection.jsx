@@ -15,9 +15,17 @@ const SpringSection = () => {
   const decorLineLeftRef = useRef(null);
   const decorLineRightRef = useRef(null);
 
+  // --- PALETTE CONSTANTS (Dusty Neon) ---
+  // Background: #160E1E (Matte Plum)
+  // Panel: #241622 (Sakura Charcoal)
+  // Primary: #E46A9F (Soft Neon Sakura)
+  // Secondary: #9D7BCF (Muted Lavender)
+  // Highlight: #7BCED9 (Calm Cyan)
+  // Text: #F1ECF7
+
   useLayoutEffect(() => {
     const ctx = gsap.context(() => {
-      // 1. FADE TRANSITION (unchanged)
+      // 1. FADE TRANSITION
       gsap.fromTo(
         fadeOverlayRef.current,
         { opacity: 1 },
@@ -32,33 +40,35 @@ const SpringSection = () => {
         }
       );
 
-      // 2. LIGHTER BLOBS (reduced complexity)
+      // 2. BLOBS (Slower, subtle movement)
       blobsRef.current.forEach((blob, index) => {
         gsap.to(blob, {
-          scale: 1.12,
-          duration: 7,
+          scale: 1.1,
+          x: "+=20",
+          y: "-=20",
+          duration: 8,
           repeat: -1,
           yoyo: true,
-          ease: "power1.inOut",
-          delay: index * 1,
+          ease: "sine.inOut",
+          delay: index * 1.5,
         });
       });
 
-      // 3. SIMPLE PETALS LIKE OVERLAYMENU (8 petals only)
+      // 3. PETALS (Soft Pink #E46A9F, No Glow)
       petalsRef.current.forEach((petal, index) => {
         gsap.set(petal, {
           x: gsap.utils.random(0, window.innerWidth),
           y: -50,
           rotation: gsap.utils.random(0, 360),
-          scale: gsap.utils.random(0.5, 1.5),
-          opacity: gsap.utils.random(0.3, 0.8),
+          scale: gsap.utils.random(0.5, 1.2),
+          opacity: gsap.utils.random(0.4, 0.9),
         });
 
         gsap.to(petal, {
           y: window.innerHeight + 100,
-          x: "+=100",
+          x: "+=80",
           rotation: 360,
-          duration: gsap.utils.random(3, 8),
+          duration: gsap.utils.random(5, 10), // Slower fall for "calm" feel
           ease: "none",
           repeat: -1,
           delay: gsap.utils.random(0, 5),
@@ -66,225 +76,183 @@ const SpringSection = () => {
         });
       });
 
-      // 4. TEXT ANIMATIONS (unchanged)
-      gsap.fromTo(
-        decorLineLeftRef.current,
-        { scaleX: 0, opacity: 0 },
-        {
-          scaleX: 1,
-          opacity: 1,
-          duration: 1,
-          ease: "power3.out",
-          scrollTrigger: {
-            trigger: sectionRef.current,
-            start: "top 50%",
-            toggleActions: "play none none reverse",
-          },
-        }
-      );
-
-      gsap.fromTo(
-        decorLineRightRef.current,
-        { scaleX: 0, opacity: 0 },
-        {
-          scaleX: 1,
-          opacity: 1,
-          duration: 1,
-          ease: "power3.out",
-          delay: 0.3,
-          scrollTrigger: {
-            trigger: sectionRef.current,
-            start: "top 50%",
-            toggleActions: "play none none reverse",
-          },
-        }
-      );
-
-      gsap.fromTo(
-        titleRef.current,
-        { x: -200, opacity: 0, scale: 0.7, rotationY: -30 },
-        {
-          x: 0,
-          opacity: 1,
-          scale: 1,
-          rotationY: 0,
-          duration: 1.5,
-          ease: "back.out(1.7)",
-          delay: 0.5,
-          scrollTrigger: {
-            trigger: sectionRef.current,
-            start: "top 50%",
-            toggleActions: "play none none reverse",
-          },
-        }
-      );
-
-      gsap.fromTo(
-        subtitleRef.current,
-        { x: 200, opacity: 0, filter: "blur(15px)" },
-        {
-          x: 0,
-          opacity: 1,
-          filter: "blur(0px)",
-          duration: 1.4,
-          ease: "power3.out",
-          delay: 1.0,
-          scrollTrigger: {
-            trigger: sectionRef.current,
-            start: "top 50%",
-            toggleActions: "play none none reverse",
-          },
-        }
-      );
-
-      gsap.fromTo(
-        cardRef.current,
-        { scale: 0.5, opacity: 0, y: 100, rotationX: 45 },
-        {
-          scale: 1,
-          opacity: 1,
-          y: 0,
-          rotationX: 0,
-          duration: 1.6,
-          ease: "back.out(2)",
-          delay: 1.4,
-          scrollTrigger: {
-            trigger: sectionRef.current,
-            start: "top 50%",
-            toggleActions: "play none none reverse",
-          },
-        }
-      );
-
-      gsap.to(cardRef.current, {
-        boxShadow: "0 15px 60px rgba(236, 64, 122, 0.25)",
-        duration: 2,
-        repeat: -1,
-        yoyo: true,
-        ease: "sine.inOut",
-        delay: 3.2,
+      // 4. UI ENTRANCE ANIMATIONS
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: sectionRef.current,
+          start: "top 60%",
+          toggleActions: "play none none reverse",
+        },
       });
+
+      // Decor Lines
+      tl.fromTo(
+        [decorLineLeftRef.current, decorLineRightRef.current],
+        { scaleX: 0, opacity: 0 },
+        { scaleX: 1, opacity: 1, duration: 1, ease: "power3.out" }
+      );
+
+      // Title
+      tl.fromTo(
+        titleRef.current,
+        { y: 30, opacity: 0, filter: "blur(10px)" },
+        { y: 0, opacity: 1, filter: "blur(0px)", duration: 1, ease: "power2.out" },
+        "-=0.8"
+      );
+
+      // Subtitle
+      tl.fromTo(
+        subtitleRef.current,
+        { y: 20, opacity: 0 },
+        { y: 0, opacity: 1, duration: 1, ease: "power2.out" },
+        "-=0.6"
+      );
+
+      // Card (Panel)
+      tl.fromTo(
+        cardRef.current,
+        { y: 50, opacity: 0, scale: 0.95 },
+        { y: 0, opacity: 1, scale: 1, duration: 1.2, ease: "back.out(1.2)" },
+        "-=0.8"
+      );
+
+      // Removed the infinite pulsing glow animation to strictly follow "Static glow = fatigue" rule.
+      // The card now relies on its border and backdrop filter for presence.
+
     }, sectionRef);
 
     return () => ctx.revert();
   }, []);
 
   return (
-    <div ref={sectionRef} className="relative w-full h-screen overflow-hidden">
-      {/* BASE BACKGROUND */}
-      <div className="absolute inset-0 bg-gradient-to-br 
-from-[#2A0F3D] 
-via-[#4A1459]
-to-[#8E1459] -z-10"></div>
+    <div ref={sectionRef} className="relative w-full h-screen overflow-hidden bg-[#160E1E]">
+      
+      {/* 1. MATTE BACKGROUND BASE */}
+      <div className="absolute inset-0 bg-[#160E1E] -z-20"></div>
 
-      {/* FADE OVERLAY */}
-      <div
-        ref={fadeOverlayRef}
-        className="absolute inset-0 bg-gradient-to-b from-[#1a0b2e] via-[#2e1a3e] to-[#1a0b2e] z-10 pointer-events-none"
-      ></div>
-
-      {/* LIGHTER BLOBS (same positions, reduced effects) */}
-      <div className="absolute inset-0 z-0">
+      {/* 2. ATMOSPHERE (Dusty/Muted Blobs) */}
+      <div className="absolute inset-0 z-0 opacity-40 pointer-events-none">
+        {/* Secondary Accent (Lavender) */}
         <div
           ref={(el) => (blobsRef.current[0] = el)}
-          className="absolute top-[10%] left-[5%] w-[450px] h-[450px] rounded-full bg-gradient-to-br from-[#f8bbd0]/30 to-transparent blur-[60px]"
+          className="absolute top-[10%] left-[10%] w-[500px] h-[500px] rounded-full bg-[#9D7BCF] blur-[120px] mix-blend-screen"
         ></div>
+        {/* Primary Accent (Sakura) - darker/dusty */}
         <div
           ref={(el) => (blobsRef.current[1] = el)}
-          className="absolute top-[50%] right-[10%] w-[500px] h-[500px] rounded-full bg-gradient-to-br from-[#ffccbc]/40 to-transparent blur-[70px]"
+          className="absolute bottom-[20%] right-[5%] w-[400px] h-[400px] rounded-full bg-[#E46A9F] blur-[100px] opacity-60 mix-blend-screen"
         ></div>
+        {/* Highlight (Cyan) - very faint */}
         <div
           ref={(el) => (blobsRef.current[2] = el)}
-          className="absolute bottom-[5%] left-[40%] w-[420px] h-[420px] rounded-full bg-gradient-to-br from-[#e1bee7]/30 to-transparent blur-[55px]"
+          className="absolute top-[40%] left-[40%] w-[300px] h-[300px] rounded-full bg-[#7BCED9] blur-[90px] opacity-30 mix-blend-screen"
         ></div>
       </div>
 
-      {/* SIMPLE CHERRY BLOSSOMS LIKE OVERLAYMENU (8 petals) */}
+      {/* 3. PETALS (Flat color, no shadow) */}
       <div className="absolute inset-0 z-5 pointer-events-none">
         {[...Array(8)].map((_, i) => (
           <div
             key={i}
             ref={(el) => (petalsRef.current[i] = el)}
-            className="absolute top-0 left-0 w-4 h-4 bg-[#FF007A] opacity-0 pointer-events-none shadow-[0_0_10px_#FF007A]"
-            style={{ 
-              clipPath: 'polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)',
+            // Changed color to #E46A9F, Removed shadow for flat/matte look
+            className="absolute top-0 left-0 w-3 h-3 bg-[#E46A9F] opacity-0 pointer-events-none"
+            style={{
+              clipPath: "polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)",
             }}
           />
         ))}
       </div>
 
-      {/* CONTENT (unchanged) */}
+      {/* 4. CONTENT */}
       <div className="relative z-20 flex flex-col items-center justify-center h-full px-8 text-center">
-        <div className="flex items-center gap-6 mb-8">
-          <div
-            ref={decorLineLeftRef}
-            className="w-24 h-[2px] bg-gradient-to-r from-transparent to-pink-400 origin-left opacity-0"
-            style={{ boxShadow: '0 0 10px rgba(236, 64, 122, 0.4)' }}
-          ></div>
-          <div className="w-3 h-3 rounded-full bg-pink-400" style={{ boxShadow: '0 0 15px rgba(236, 64, 122, 0.6)' }}></div>
-          <div
-            ref={decorLineRightRef}
-            className="w-24 h-[2px] bg-gradient-to-l from-transparent to-pink-400 origin-right opacity-0"
-            style={{ boxShadow: '0 0 10px rgba(236, 64, 122, 0.4)' }}
-          ></div>
-        </div>
+        
+        {/* Decorative Header Lines */}
+     
 
+        {/* Title */}
         <h1
           ref={titleRef}
-          className="text-7xl md:text-9xl font-black mb-6 opacity-0"
+          className="text-6xl md:text-8xl font-bold mb-6 opacity-0 tracking-tight"
           style={{
-            background: 'linear-gradient(135deg, #ec407a 0%, #f06292 50%, #f8bbd0 100%)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            textShadow: '0 8px 30px rgba(236, 64, 122, 0.3)',
-            perspective: '1000px',
+            color: "#F1ECF7",
+            // Subtle text shadow, tight and dark, just for legibility
+            textShadow: "0 4px 12px rgba(0,0,0,0.3)", 
           }}
         >
-          CHERRY BLOOM
+          ABOUT <span className="text-[#E46A9F] font-light"> AHOUBA</span>
         </h1>
 
+          <div className="flex items-center gap-6 mb-8">
+          <div
+            ref={decorLineLeftRef}
+            className="w-24 h-[1px] bg-gradient-to-r from-transparent to-[#E46A9F] origin-left opacity-0"
+          ></div>
+          {/* Diamond instead of glowy circle */}
+          <div className="w-2 h-2 rotate-45 border border-[#E46A9F] bg-[#160E1E]"></div>
+          <div
+            ref={decorLineRightRef}
+            className="w-24 h-[1px] bg-gradient-to-l from-transparent to-[#E46A9F] origin-right opacity-0"
+          ></div>
+        </div>
+        {/* Subtitle */}
         <p
           ref={subtitleRef}
-          className="text-2xl md:text-3xl text-pink-900/80 mb-16 max-w-3xl font-light tracking-wide opacity-0"
-          style={{
-            textShadow: '0 2px 10px rgba(236, 64, 122, 0.1)',
-          }}
+          className="text-xl md:text-2xl text-[#9D7BCF] mb-16 max-w-2xl font-light tracking-wide opacity-0"
         >
-          Delicate petals drift • A symphony of spring awakening
+          The Annual Fest of <span className="text-[#7BCED9]">IIIT Senapati, Manipur </span>
         </p>
 
+        {/* Card (The Sakura Charcoal Panel) */}
         <div
           ref={cardRef}
-          className="relative p-10 bg-white/60 backdrop-blur-md rounded-[2rem] border border-pink-200/40 max-w-2xl opacity-0"
+          // Bg: Sakura Charcoal (#241622) with opacity
+          // Border: 1px solid rgba(228, 106, 159, 0.25)
+          // Blur: backdrop-blur-xl (Heavy blur, low shine)
+          className="relative p-10 bg-[#241622]/80 backdrop-blur-xl rounded-xl border border-[#E46A9F]/25 max-w-2xl opacity-0 group transition-all duration-500"
           style={{
-            boxShadow: '0 10px 50px rgba(236, 64, 122, 0.15)',
-            perspective: '1000px',
+            // No static box-shadow. 
           }}
         >
-          <div className="absolute top-3 left-3 w-8 h-8 border-l-2 border-t-2 border-pink-300 rounded-tl-lg"></div>
-          <div className="absolute bottom-3 right-3 w-8 h-8 border-r-2 border-b-2 border-pink-300 rounded-br-lg"></div>
-          
-          <p className="text-lg md:text-xl text-gray-700 leading-relaxed">
-            Spring whispers softly through the air—cherry blossoms dance on gentle winds, 
-            each petal a fleeting moment of beauty. Nature awakens with quiet grace.
+          {/* Interaction Glow: Only on Hover */}
+          <div className="absolute inset-0 rounded-xl transition-all duration-500 opacity-0 group-hover:opacity-100 pointer-events-none"
+               style={{
+                 boxShadow: "0 0 20px rgba(228, 106, 159, 0.15)", // Very subtle glow on hover
+                 border: "1px solid rgba(228, 106, 159, 0.5)"
+               }}
+          ></div>
+
+          {/* Corner Accents (Cyan #7BCED9) */}
+          <div className="absolute top-0 left-0 w-6 h-6 border-l border-t border-[#7BCED9]/50 rounded-tl-md"></div>
+          <div className="absolute bottom-0 right-0 w-6 h-6 border-r border-b border-[#7BCED9]/50 rounded-br-md"></div>
+
+          <p className="text-lg md:text-xl text-[#F1ECF7]/90 leading-relaxed font-light text-justify">
+            <span className="text-[#E46A9F]">Ahouba</span> is the annual technical fest of <span className="text-[#E46A9F]">IIIT Manipur. </span>
+  It is organized by the students of the institute.
+The fest features a range of technical events and competitions.
+Coding contests, quizzes, and problem-solving challenges are part of the lineup.
+Workshops and talks are conducted during the fest.
+Students from different colleges are invited to participate.
+Both team-based and individual events are organized.
+Ahouba offers participants a chance to test their skills in a competitive setting.
+The fest also includes a few informal and fun events.
+It provides space for interaction and collaboration among students.
+Events are designed to be accessible to participants with different skill levels.
+The fest encourages practical learning through hands-on activities.
+Ahouba is held annually at the IIIT Manipur campus.
+It is one of the key student-led events of the institute.
+Overall, Ahouba offers a balanced mix of competition, learning, and engagement.
+            <span className="text-[#E46A9F]"></span>
           </p>
         </div>
       </div>
 
-      {/* LIGHT GRADIENT */}
+      {/* FADE OVERLAY (Transition helper) */}
       <div
-        className="absolute inset-0 z-[1] pointer-events-none opacity-20"
-        style={{
-          background: 'radial-gradient(ellipse at 50% 30%, rgba(255,255,255,0.3) 0%, transparent 60%)',
-        }}
+        ref={fadeOverlayRef}
+        className="absolute inset-0 bg-[#160E1E] z-50 pointer-events-none"
       ></div>
 
-      <style jsx="true">{`
-        @keyframes float {
-          0%, 100% { transform: translateY(0px); }
-          50% { transform: translateY(-20px); }
-        }
-      `}</style>
     </div>
   );
 };
