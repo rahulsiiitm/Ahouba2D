@@ -1,5 +1,4 @@
 import React, { useEffect, useState, useRef, useLayoutEffect } from "react";
-
 import gsap from "gsap";
 import sideCharacter from "./assets/overlaySideCharacter.png";
 
@@ -8,12 +7,16 @@ const OverlayMenu = ({ isOpen, closeMenu }) => {
   const linksRef = useRef([]);
   const petalsRef = useRef([]);
   const characterRef = useRef(null);
-  const notificationRef = useRef(null);
-  const notificationInnerRef = useRef(null);
-  const [isFirstPage, setIsFirstPage] = useState(true);
-
   
-  const tlRef = useRef(null);
+  // Notification Refs
+  const notificationRef = useRef(null); 
+  const notificationBoxRef = useRef(null);
+  const toggleBtnRef = useRef(null); // ✅ NEW REF for the button
+  
+  const [isFirstPage, setIsFirstPage] = useState(true);
+  const [isExpanded, setIsExpanded] = useState(true);
+  
+  const tlRef = useRef(null); 
 
   const menuLinks = [
     { id: "01", label: "HOME", link: "/" },
@@ -27,41 +30,128 @@ const OverlayMenu = ({ isOpen, closeMenu }) => {
   
   const particles = Array.from({ length: 20 });
 
-// ✅ FIXED: Hide notification on pages 2+
-useEffect(() => {
-  const handleScroll = () => {
-    const scrollTop = window.scrollY;
-    const firstPageEnd = window.innerHeight * 2; // End of Goku + first transition
-    setIsFirstPage(scrollTop < firstPageEnd);
-  };
-  
-  window.addEventListener('scroll', handleScroll);
-  handleScroll(); // Check initial position
-  return () => window.removeEventListener('scroll', handleScroll);
-}, []);
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollTop = window.scrollY;
+      const firstPageEnd = window.innerHeight * 2; 
+      setIsFirstPage(scrollTop < firstPageEnd);
+    };
+    window.addEventListener('scroll', handleScroll);
+    handleScroll(); 
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
+  // --- NOTIFICATION ANIMATION ---
+  useLayoutEffect(() => {
+    if (!notificationBoxRef.current) return;
 
-  // 1. SETUP ANIMATION (Run once)
+    const ctx = gsap.context(() => {
+      const tl = gsap.timeline();
+
+      if (isExpanded) {
+        // --- OPEN SEQUENCE ---
+        
+        // 1. Expand Box
+        tl.to(notificationBoxRef.current, {
+          width: 380, 
+          height: "auto", 
+          borderRadius: "0px", 
+          backgroundColor: "rgba(5, 11, 20, 0.9)",
+          borderColor: "rgba(0, 243, 255, 0.4)",
+          boxShadow: "0 0 30px rgba(0, 243, 255, 0.2)",
+          duration: 0.6,
+          ease: "back.out(1.2)"
+        })
+        
+        // 2. Move Button to Top-Left (Padding position)
+        .to(toggleBtnRef.current, {
+            top: "24px",   // Matches p-6 (24px)
+            left: "24px",  // Matches p-6 (24px)
+            xPercent: 0,   // Reset centering
+            yPercent: 0,   // Reset centering
+            duration: 0.5,
+            ease: "power2.inOut"
+        }, "<")
+
+        // 3. Scanline
+        .fromTo(".scanline", 
+          { top: "-10%", opacity: 1 },
+          { top: "110%", opacity: 0, duration: 0.5, ease: "power1.in" },
+          "-=0.4"
+        )
+        // 4. Content
+        .to(".content-wrapper", {
+          opacity: 1,
+          visibility: "visible",
+          duration: 0.1
+        }, "-=0.3")
+        .fromTo(".title-text",
+          { x: -20, opacity: 0 },
+          { x: 0, opacity: 1, duration: 0.4, ease: "power2.out" },
+          "-=0.2"
+        )
+        .fromTo(".stagger-item",
+          { y: 20, opacity: 0, filter: "blur(5px)" },
+          { y: 0, opacity: 1, filter: "blur(0px)", stagger: 0.1, duration: 0.5, ease: "power2.out" },
+          "-=0.3"
+        )
+        .to(".decorations", { opacity: 1, duration: 0.5 }, "-=0.5");
+
+      } else {
+        // --- CLOSE SEQUENCE ---
+        
+        // 1. Hide Content
+        tl.to([".content-wrapper", ".decorations"], {
+          opacity: 0,
+          duration: 0.2
+        })
+        
+        // 2. Shrink Box
+        .to(notificationBoxRef.current, {
+          width: 50, 
+          height: 50,
+          borderRadius: "50%", 
+          backgroundColor: "rgba(0, 0, 0, 0.5)", 
+          borderColor: "rgba(0, 243, 255, 0.4)", 
+          boxShadow: "0 0 10px rgba(0, 243, 255, 0.4)", 
+          duration: 0.4,
+          ease: "power3.inOut"
+        }, "<")
+        
+        // 3. Move Button to Dead Center
+        // We use top/left 50% + x/yPercent -50% for perfect centering regardless of size
+        .to(toggleBtnRef.current, {
+            top: "50%",
+            left: "50%",
+            xPercent: -50,
+            yPercent: -50,
+            duration: 0.4,
+            ease: "power3.inOut",
+            scale:1.5
+        }, "<");
+      }
+    }, notificationRef);
+
+    return () => ctx.revert();
+  }, [isExpanded]);
+
+  // --- MENU ANIMATION ---
   useLayoutEffect(() => {
     const ctx = gsap.context(() => {
       const tl = gsap.timeline({ paused: true });
 
-      // INITIAL STATES
       gsap.set(characterRef.current, { y: 200, opacity: 0, scale: 0.8 });
       gsap.set(linksRef.current, { x: 100, opacity: 0 });
       gsap.set(containerRef.current, { x: "100%" });
 
-      // FLOATING ANIMATION (Continuous)
-      gsap.to(notificationInnerRef.current, {
-        y: -10, // Adjusted slightly for smoother float
+      gsap.to(notificationRef.current, {
+        y: -10,
         duration: 2,
         ease: "sine.inOut",
         yoyo: true,
         repeat: -1,
       });
 
-      // ANIMATION SEQUENCE
-      // A. Hide Notification
       tl.to(notificationRef.current, {
         opacity: 0,
         y: -20,
@@ -70,14 +160,12 @@ useEffect(() => {
         pointerEvents: "none",
       }, 0);
 
-      // B. Slide Menu
       tl.to(containerRef.current, {
         x: "0%",
         duration: 0.8,
         ease: "power4.out",
       }, 0);
 
-      // C. Character Pop
       tl.to(characterRef.current, {
         y: 0,
         opacity: 1,
@@ -86,7 +174,6 @@ useEffect(() => {
         ease: "back.out(1.5)",
       }, "-=0.6");
 
-      // D. Links
       tl.to(linksRef.current, {
         x: 0,
         opacity: 1,
@@ -101,16 +188,12 @@ useEffect(() => {
     return () => ctx.revert();
   }, []);
 
-  // 2. TOGGLE ANIMATION (Run on click)
   useEffect(() => {
     if (tlRef.current) {
       if (isOpen) {
         tlRef.current.play();
-        
-        // --- FIXED SAKURA ANIMATION LOOP ---
-        // We iterate over each petal to give them UNIQUE random values
         petalsRef.current.forEach((petal) => {
-            // 1. Reset position to top with random properties
+            if(!petal) return;
             gsap.set(petal, {
                 x: gsap.utils.random(0, window.innerWidth),
                 y: -50,
@@ -118,19 +201,17 @@ useEffect(() => {
                 scale: gsap.utils.random(0.5, 1.5),
                 opacity: gsap.utils.random(0.3, 0.8),
             });
-            // 2. Animate falling down
             gsap.to(petal, {
                 y: window.innerHeight + 100,
-                x: "+=100", // Drift slightly right
+                x: "+=100", 
                 rotation: "+=360",
                 duration: gsap.utils.random(3, 8),
                 ease: "none",
                 repeat: -1,
-                delay: gsap.utils.random(0, 5), // Random start times
+                delay: gsap.utils.random(0, 5),
                 overwrite: true 
             });
         });
-
       } else {
         tlRef.current.reverse();
       }
@@ -139,62 +220,82 @@ useEffect(() => {
 
   return (
     <>
-      {/* 1. NOTIFICATION */}
       {isFirstPage && (
-  <div 
-    ref={notificationRef}
-    className="absolute top-[70vh] left-[14vw] md:left-25 md:top-80 z-20 max-w-[85vw] w-[380px] font-sans scale-x-110 md:opacity-100%"
-  > 
-
         <div 
-          ref={notificationInnerRef}
-          className="relative p-6 bg-[#050b14]/85 backdrop-blur-md border border-[#00F3FF]/40 shadow-[0_0_20px_rgba(0,243,255,0.15)] overflow-hidden"
+          ref={notificationRef}
+          className="absolute top-[70vh] left-[14vw] md:left-25 md:top-80 z-20 font-sans scale-x-110 md:opacity-100"
         >
-          <div className="absolute top-0 left-0 w-[2px] h-6 bg-[#00F3FF]"></div>
-          <div className="absolute top-0 left-0 w-16 h-[2px] bg-[#00F3FF] shadow-[0_0_8px_#00F3FF]"></div>
-          <div className="absolute bottom-0 right-0 w-[2px] h-6 bg-[#00F3FF]"></div>
-          <div className="absolute bottom-0 right-0 w-16 h-[2px] bg-[#00F3FF] shadow-[0_0_8px_#00F3FF]"></div>
-          
-          <div className="flex items-center gap-3 mb-5 border-b border-[#00F3FF]/20 pb-3">
-            <div className="flex items-center justify-center w-8 h-8 rounded-full border border-[#00F3FF] text-[#00F3FF] shadow-[0_0_10px_rgba(0,243,255,0.4)]">
-              <span className="text-lg font-bold">!</span>
+          <div 
+            ref={notificationBoxRef} 
+            className="relative overflow-hidden border backdrop-blur-md w-[380px]"
+          >
+            <div className="scanline absolute left-0 w-full h-[2px] bg-white shadow-[0_0_10px_white] z-50 pointer-events-none opacity-0" />
+
+            <div className="decorations opacity-0 transition-opacity">
+              <div className="absolute top-0 left-0 w-[2px] h-6 bg-[#00F3FF]"></div>
+              <div className="absolute top-0 left-0 w-16 h-[2px] bg-[#00F3FF] shadow-[0_0_8px_#00F3FF]"></div>
+              <div className="absolute bottom-0 right-0 w-[2px] h-6 bg-[#00F3FF]"></div>
+              <div className="absolute bottom-0 right-0 w-16 h-[2px] bg-[#00F3FF] shadow-[0_0_8px_#00F3FF]"></div>
+              <div className="absolute inset-0 z-[-1] opacity-10 pointer-events-none"
+                   style={{ backgroundImage: "linear-gradient(#00F3FF 1px, transparent 1px), linear-gradient(90deg, #00F3FF 1px, transparent 1px)", backgroundSize: "24px 24px" }}
+              ></div>
             </div>
-            <h2 className="text-[#00F3FF] tracking-[0.2em] text-lg font-bold drop-shadow-[0_0_5px_rgba(0,243,255,0.8)]">
-              NOTIFICATION
-            </h2>
-          </div>
 
-          <div className="text-sm md:text-base leading-relaxed text-gray-300 mb-6 font-mono">
-            <p className="mt-2 text-[#00F3FF]/80">
-              GREETINGS
-            </p>
-            <p>
-              CLICK HERE TO REGISTER FOR <span className="text-red-500 font-bold animate-pulse text-lg">AHOUBA</span>
-            </p>
-            
-            {/* <p className="mt-4 font-bold text-white text-lg tracking-wide">
-              Will you accept?
-            </p> */}
-          </div>
+            {/* INNER CONTAINER: Added explicit padding (p-6) so text aligns correctly */}
+            <div className="relative p-6 flex flex-col w-full h-full">
+              
+              <div className="flex items-center w-full">
+                
+                {/* TOGGLE BUTTON - ABSOLUTE POSITIONED via GSAP */}
+                {/* We removed 'relative/absolute' classes here to let GSAP handle it fully */}
+                <div 
+                  ref={toggleBtnRef}
+                  onClick={() => setIsExpanded(!isExpanded)}
+                  className="absolute flex items-center justify-center w-[30px] h-[30px] md:w-8 md:h-8 rounded-full border border-[#00F3FF] text-[#00F3FF] shadow-[0_0_10px_rgba(0,243,255,0.4)] cursor-pointer hover:bg-[#00F3FF] hover:text-black transition-colors duration-300 z-[60] bg-black/40"
+                  style={{ top: "24px", left: "24px" }} // Default Open Position
+                >
+                  <span className="text-lg font-bold select-none leading-none pt-[1px]">!</span>
+                </div>
 
-          <div className="flex gap-4">
-            <button className="flex-1 py-3 border border-[#00F3FF] text-[#00F3FF] text-sm hover:bg-[#00F3FF] hover:text-black transition-all duration-300 uppercase tracking-widest font-bold shadow-[0_0_10px_rgba(0,243,255,0.2)] hover:shadow-[0_0_20px_rgba(0,243,255,0.6)]">
-              REGISTER
-            </button>
-            <button className="flex-1 py-3 border border-red-500 text-red-500 text-sm hover:bg-red-500 hover:text-white transition-all duration-300 uppercase tracking-widest font-bold shadow-[0_0_10px_rgba(239,68,68,0.2)] hover:shadow-[0_0_20px_rgba(239,68,68,0.6)]">
-              LOGIN
-            </button>
-          </div>
-          <div className="absolute inset-0 z-[-1] opacity-10 pointer-events-none"
-             style={{ backgroundImage: "linear-gradient(#00F3FF 1px, transparent 1px), linear-gradient(90deg, #00F3FF 1px, transparent 1px)", backgroundSize: "24px 24px" }}
-          ></div>
-        </div>
-      </div> )}
+                {/* TITLE CONTAINER - Added ml-12 to push text away from the absolute button */}
+                <div className="content-wrapper opacity-0 invisible w-full overflow-hidden ml-12">
+                    <div className="title-text border-b border-[#00F3FF]/20 pb-2 w-full">
+                        <h2 className="text-[#00F3FF] tracking-[0.2em] text-lg font-bold drop-shadow-[0_0_5px_rgba(0,243,255,0.8)] whitespace-nowrap">
+                        NOTIFICATION
+                        </h2>
+                    </div>
+                </div>
+              </div>
 
-      {/* 2. CHARACTER */}
+              <div className="content-wrapper opacity-0 invisible mt-4 overflow-hidden w-full">
+                <div className="text-sm md:text-base leading-relaxed text-gray-300 mb-6 font-mono">
+                    <p className="stagger-item mt-2 text-[#00F3FF]/80 animate-pulse">
+                    GREETINGS
+                    </p>
+                    <p className="stagger-item mt-2">
+                    CLICK HERE TO REGISTER FOR <span className="text-red-500 font-bold text-lg">AHOUBA</span>
+                    </p>
+                </div>
+
+                <div className="flex gap-4">
+                    <button className="stagger-item flex-1 py-3 border border-[#00F3FF] text-[#00F3FF] text-sm hover:bg-[#00F3FF] hover:text-black transition-all duration-300 uppercase tracking-widest font-bold shadow-[0_0_10px_rgba(0,243,255,0.2)] hover:shadow-[0_0_20px_rgba(0,243,255,0.6)]">
+                    REGISTER
+                    </button>
+                    <button className="stagger-item flex-1 py-3 border border-red-500 text-red-500 text-sm hover:bg-red-500 hover:text-white transition-all duration-300 uppercase tracking-widest font-bold shadow-[0_0_10px_rgba(239,68,68,0.2)] hover:shadow-[0_0_20px_rgba(239,68,68,0.6)]">
+                    LOGIN
+                    </button>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div> 
+      )}
+
+      {/* CHARACTER & MENU (Unchanged) */}
       <div
         ref={characterRef}
-        className="fixed md:bottom-0 left-[-6.5vw] z-300 w-[50vw] md:w-[30vw] bottom-85  h-auto pointer-events-none origin-bottom opacity-0"
+        className="fixed md:bottom-0 left-[-6.5vw] z-300 w-[50vw] md:w-[30vw] bottom-85 h-auto pointer-events-none origin-bottom opacity-0"
       >
         <img 
           src={sideCharacter} 
@@ -203,7 +304,6 @@ useEffect(() => {
         />
       </div>
 
-      {/* MAIN MENU CONTAINER */}
       <div
         ref={containerRef}
         className="fixed top-0 right-0 h-full w-full z-400 
@@ -212,7 +312,6 @@ useEffect(() => {
                   flex flex-col justify-center items-center overflow-hidden
                   [clip-path:polygon(25%_0,100%_0,100%_100%,0%_100%)]"
       >
-        
         <div className="absolute top-1/2 left-[15%] -translate-y-1/2 text-[40vh] font-black text-[#FF007A] opacity-5 select-none pointer-events-none whitespace-nowrap blur-sm">
           祭り
         </div>
@@ -222,8 +321,6 @@ useEffect(() => {
         <div className="absolute bottom-10 left-[30%] flex flex-col gap-1 opacity-40">
            <div className="w-48 h-[2px] bg-[#F0F600]"></div>
         </div>
-        
-        {/* SAKURA PARTICLES RENDER */}
         {particles.map((_, i) => (
           <div
             key={i}
@@ -232,7 +329,6 @@ useEffect(() => {
             style={{ clipPath: "polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)" }}
           ></div>
         ))}
-        
         <div className="absolute inset-0 opacity-20 pointer-events-none"
              style={{
                backgroundImage: "linear-gradient(#FF007A 1px, transparent 1px), linear-gradient(90deg, #FF007A 1px, transparent 1px)",

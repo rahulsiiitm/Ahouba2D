@@ -81,12 +81,12 @@ const SecondSection = () => {
       {/* Characters Layer */}
       <div className="absolute top-0 left-0 h-[200vh] w-[45vw] md:w-[25vw] z-20 pointer-events-none">
         <img src={eva} alt="Eva" className="w-full md:h-full relative top-10 object-contain object-left-top drop-shadow-[0_0_40px_rgba(255,0,122,0.6)]" />
-        <div className="absolute top-10 left-10 w-32 h-[80vh] bg-gradient-to-b from-[#FF007A] to-[#00F3FF] rounded-lg shadow-[0_0_50px_rgba(255,0,122,0.8)] opacity-0 md:opacity-100 "/>
+        {/* <div className="absolute top-10 left-10 w-32 h-[80vh] bg-gradient-to-b from-[#FF007A] to-[#00F3FF] rounded-lg shadow-[0_0_50px_rgba(255,0,122,0.8)] opacity-0 md:opacity-100 "/> */}
       </div>
 
       <div className="absolute top-0 md:right-[-12vh] right-[-8vh] h-[100vh] w-[75vw] md:w-[45vw] z-20 pointer-events-none">
         <img src={gndm} alt="Gundam" className="w-[100vw] h-full object-contain object-right-bottom relative drop-shadow-[0_0_40px_rgba(0,243,255,0.6)]" />
-        <div className="absolute top-10 right-40 w-32 h-[80vh] bg-gradient-to-b from-[#00F3FF] to-[#FF007A] rounded-lg shadow-[0_0_50px_rgba(0,243,255,0.8)] opacity-0 md:opacity-100 "/>
+        {/* <div className="absolute top-10 right-40 w-32 h-[80vh] bg-gradient-to-b from-[#00F3FF] to-[#FF007A] rounded-lg shadow-[0_0_50px_rgba(0,243,255,0.8)] opacity-0 md:opacity-100 "/> */}
       </div>
 
       {/* --- UI Container --- */}

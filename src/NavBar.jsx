@@ -51,7 +51,7 @@ const Navbar = () => {
         // bg-[#1A0B2E]/90: Deep Purple background (90% opacity)
         // border-b-4 border-[#FF007A]: Thick "Laser Pink" bottom border (Very Promare style)
         // shadow-[...]: Pink glow under the border
-        className="pointer-events-auto md:w-[75%] md:h-24 h-20 relative w-[85%]
+        className="pointer-events-auto md:w-[75%] md:h-19 h-20 relative w-[85%]    
                    bg-[#1A0B2E]/90 backdrop-blur-md 
                    border-b-4 border-[#FF007A]
                    shadow-[0_4px_30px_rgba(255,0,122,0.4)]

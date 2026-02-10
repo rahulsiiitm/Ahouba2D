@@ -6,7 +6,6 @@ import SpringSection from './SpringSection.jsx';
 import SummerSection from './SummerSection.jsx';
 import AutumnSection from './AutumnSection.jsx';
 import SecondSection from './SecondSection.jsx';
-// REPLACE CircleReveal with our new component
 import FracturedParallelogramTransition from './PageTransition.jsx'; 
 import goku from "./assets/Frame3.jpg";
 
@@ -26,17 +25,21 @@ const GokuPage = memo(({ sectionRef }) => (
       src={goku} 
       alt="Goku" 
       className="absolute inset-0 w-full h-full object-cover" 
-      style={{ filter: 'sepia(0.2) hue-rotate(280deg) saturate(0.7) brightness(0.88)' }}
+      style={{ filter: 'grayscale(0.8) brightness(0.7) contrast(1.7)' }}
       loading="eager" 
     />
-    <div className="absolute inset-0 bg-blue-600/30 mix-blend-screen pointer-events-none" />
-    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20 pointer-events-none" />
+    <div
+      className="absolute inset-0 pointer-events-none"
+      style={{
+        background: `linear-gradient(to right, rgba(0,0,0,1) 0%, rgba(0,0,0,0.68) 25%, rgba(0,0,0,0) 50%, rgba(0,0,0,0.68) 75%, rgba(0,0,0,1) 100%)`
+      }}
+    />
   </div>
 ));
 
+// MODIFIED: SpacePage now starts hidden (opacity 0, zIndex 1) because it comes 3rd
 const SpacePage = memo(({ sectionRef, parent }) => (
-  // Start with lower zIndex so Goku is on top initially
-  <div ref={sectionRef} style={{ ...fixedPageStyle, zIndex: 8, opacity: 1 }}>
+  <div ref={sectionRef} style={{ ...fixedPageStyle, zIndex: 1, opacity: 0 }}>
     <SecondSection father={parent} />
   </div>
 ));
@@ -72,18 +75,26 @@ function App() {
   return (
     <>
       {/* SCROLLABLE TRACK */}
-      <div ref={PARENT} className="relative w-full" style={{ height: '2600vh' }}>
+      {/* Increased height slightly to accommodate gaps */}
+      <div ref={PARENT} className="relative w-full" style={{ height: 'auto', minHeight: '2600vh' }}>
         <div className="h-screen" /> 
         
-        {/* T1: Goku -> Space */}
+        {/* --- T1: Goku -> Spring --- */}
         <div ref={transitionRefs.t1} className="h-[300vh]" />
 
-        {/* SPACE ANIMATION ZONE */}
-        <div id="space-trigger" className="h-[100vh] bg-transparent" />
+        {/* Spring Content Buffer */}
+        <div className="h-[100vh]" />
 
-        {/* Following Seasons */}
+        {/* --- T2: Spring -> Space --- */}
         <div ref={transitionRefs.t2} className="h-[300vh]" />
+
+        {/* Space Content Buffer */}
+        <div id="space-trigger" className="h-[150vh] bg-transparent" />
+
+        {/* --- T3: Space -> Summer --- */}
         <div ref={transitionRefs.t3} className="h-[300vh]" />
+
+        {/* --- T4: Summer -> Autumn --- */}
         <div ref={transitionRefs.t4} className="h-[300vh]" />
         
         <div className="h-screen" /> 
@@ -91,7 +102,7 @@ function App() {
 
       <div className="fixed inset-0 w-full h-screen overflow-hidden pointer-events-none">
         
-        {/* UI LAYER (Navbar + Menu) - Interactive */}
+        {/* UI LAYER */}
         <div className="fixed top-0 left-0 right-0 z-[1000] pointer-events-auto">
           <Navbar toggleMenu={toggleMenu} />
           <GlitchMenu onClick={toggleMenu} isOpen={isMenuOpen} />
@@ -101,37 +112,45 @@ function App() {
            <OverlayMenu isOpen={isMenuOpen} closeMenu={closeMenu} />
         </div>
 
-        <GokuPage sectionRef={sectionRefs.goku} />
-        <SpacePage sectionRef={sectionRefs.space} />
+        {/* --- PAGES --- */}
         
+        {/* 1. Goku */}
+        <GokuPage sectionRef={sectionRefs.goku} />
+        
+        {/* 2. Spring (Swapped to be 2nd) */}
         <PageWrapper sectionRef={sectionRefs.spring}><SpringSection /></PageWrapper>
+
+        {/* 3. Space (Swapped to be 3rd) */}
+        <SpacePage sectionRef={sectionRefs.space} parent={PARENT} />
+        
+        {/* 4. Summer & Autumn */}
         <PageWrapper sectionRef={sectionRefs.summer}><SummerSection /></PageWrapper>
         <PageWrapper sectionRef={sectionRefs.autumn}><AutumnSection /></PageWrapper>
 
-        {/* TRANSITIONS */}
+        {/* --- TRANSITIONS --- */}
         
-        {/* Goku -> Space */}
+        {/* 1. Goku -> Spring */}
         <FracturedParallelogramTransition
-          color1="#0a0015" // Matches Space background
+          color1="#2e1a3e" // Spring Color
           triggerRef={transitionRefs.t1}
-          nextSectionRef={sectionRefs.space}
-        />
-
-        {/* Space -> Spring */}
-        <FracturedParallelogramTransition
-          color1="#2e1a3e" 
-          triggerRef={transitionRefs.t2}
           nextSectionRef={sectionRefs.spring}
         />
 
-        {/* Spring -> Summer */}
+        {/* 2. Spring -> Space */}
         <FracturedParallelogramTransition
-          color1="#f8bbd0" 
+          color1="#050b14" // Space Color (Dark Navy/Black)
+          triggerRef={transitionRefs.t2}
+          nextSectionRef={sectionRefs.space}
+        />
+
+        {/* 3. Space -> Summer */}
+        <FracturedParallelogramTransition
+          color1="#f8bbd0" // Summer Color
           triggerRef={transitionRefs.t3}
           nextSectionRef={sectionRefs.summer}
         />
 
-        {/* Summer -> Autumn */}
+        {/* 4. Summer -> Autumn */}
         <FracturedParallelogramTransition
           color1="#ffe0b2" 
           triggerRef={transitionRefs.t4}
