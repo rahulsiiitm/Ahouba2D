@@ -6,7 +6,8 @@ import SpringSection from './SpringSection.jsx';
 import SummerSection from './SummerSection.jsx';
 import AutumnSection from './AutumnSection.jsx';
 import SecondSection from './SecondSection.jsx';
-import CircleRevealTransition from './PageTransition.jsx';
+// REPLACE CircleReveal with our new component
+import FracturedParallelogramTransition from './PageTransition.jsx'; 
 import goku from "./assets/Frame3.jpg";
 
 const fixedPageStyle = {
@@ -34,6 +35,7 @@ const GokuPage = memo(({ sectionRef }) => (
 ));
 
 const SpacePage = memo(({ sectionRef, parent }) => (
+  // Start with lower zIndex so Goku is on top initially
   <div ref={sectionRef} style={{ ...fixedPageStyle, zIndex: 8, opacity: 1 }}>
     <SecondSection father={parent} />
   </div>
@@ -50,12 +52,18 @@ function App() {
   const PARENT = useRef(null);
 
   const transitionRefs = {
-    t1: useRef(null), t2: useRef(null), t3: useRef(null), t4: useRef(null),
+    t1: useRef(null), 
+    t2: useRef(null), 
+    t3: useRef(null), 
+    t4: useRef(null),
   };
 
   const sectionRefs = {
-    goku: useRef(null), space: useRef(null),
-    spring: useRef(null), summer: useRef(null), autumn: useRef(null),
+    goku: useRef(null), 
+    space: useRef(null),
+    spring: useRef(null), 
+    summer: useRef(null), 
+    autumn: useRef(null),
   };
 
   const toggleMenu = useCallback(() => setIsMenuOpen(v => !v), []);
@@ -71,7 +79,7 @@ function App() {
         <div ref={transitionRefs.t1} className="h-[300vh]" />
 
         {/* SPACE ANIMATION ZONE */}
-        <div id="space-trigger" className="h-[2160vh] bg-transparent" />
+        <div id="space-trigger" className="h-[100vh] bg-transparent" />
 
         {/* Following Seasons */}
         <div ref={transitionRefs.t2} className="h-[300vh]" />
@@ -89,38 +97,47 @@ function App() {
           <GlitchMenu onClick={toggleMenu} isOpen={isMenuOpen} />
         </div>
 
-        {/* FIX: Wrap OverlayMenu in pointer-events-auto to restore hover/clicks */}
         <div className="pointer-events-auto">
            <OverlayMenu isOpen={isMenuOpen} closeMenu={closeMenu} />
         </div>
 
         <GokuPage sectionRef={sectionRefs.goku} />
-        <SpacePage sectionRef={sectionRefs.space} parent={PARENT} />
+        <SpacePage sectionRef={sectionRefs.space} />
         
         <PageWrapper sectionRef={sectionRefs.spring}><SpringSection /></PageWrapper>
         <PageWrapper sectionRef={sectionRefs.summer}><SummerSection /></PageWrapper>
         <PageWrapper sectionRef={sectionRefs.autumn}><AutumnSection /></PageWrapper>
 
-        <CircleRevealTransition
-          color1="#f06292" triggerRef={transitionRefs.t1}
-          currentSectionRef={sectionRefs.goku} nextSectionRef={sectionRefs.space}
-          originPosition="top-left"
+        {/* TRANSITIONS */}
+        
+        {/* Goku -> Space */}
+        <FracturedParallelogramTransition
+          color1="#0a0015" // Matches Space background
+          triggerRef={transitionRefs.t1}
+          nextSectionRef={sectionRefs.space}
         />
-        <CircleRevealTransition
-          color1="#2e1a3e" triggerRef={transitionRefs.t2}
-          currentSectionRef={sectionRefs.space} nextSectionRef={sectionRefs.spring}
-          originPosition="bottom-right"
+
+        {/* Space -> Spring */}
+        <FracturedParallelogramTransition
+          color1="#2e1a3e" 
+          triggerRef={transitionRefs.t2}
+          nextSectionRef={sectionRefs.spring}
         />
-        <CircleRevealTransition
-          color1="#f8bbd0" triggerRef={transitionRefs.t3}
-          currentSectionRef={sectionRefs.spring} nextSectionRef={sectionRefs.summer}
-          originPosition="top-right"
+
+        {/* Spring -> Summer */}
+        <FracturedParallelogramTransition
+          color1="#f8bbd0" 
+          triggerRef={transitionRefs.t3}
+          nextSectionRef={sectionRefs.summer}
         />
-        <CircleRevealTransition
-          color1="#ffe0b2" triggerRef={transitionRefs.t4}
-          currentSectionRef={sectionRefs.summer} nextSectionRef={sectionRefs.autumn}
-          originPosition="bottom-left"
+
+        {/* Summer -> Autumn */}
+        <FracturedParallelogramTransition
+          color1="#ffe0b2" 
+          triggerRef={transitionRefs.t4}
+          nextSectionRef={sectionRefs.autumn}
         />
+
       </div>
     </>
   );
