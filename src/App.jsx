@@ -1,5 +1,6 @@
 import React, { useState, useRef, useCallback, memo, useLayoutEffect, useEffect } from 'react';
 import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Navbar from './NavBar';
 import GlitchMenu from './GlitchMenu';
 import OverlayMenu from './OverlayMenu';
@@ -9,6 +10,8 @@ import AutumnSection from './AutumnSection.jsx';
 import SecondSection from './SecondSection.jsx';
 import FracturedParallelogramTransition from './PageTransition.jsx'; 
 import goku from "./assets/Frame3.jpg";
+
+gsap.registerPlugin(ScrollTrigger);
 
 // --- 1. TRIBAL PATHS (UNCHANGED) ---
 const TRIBAL_PATHS = {
@@ -28,7 +31,7 @@ const TribalLetter = ({ char }) => {
       <svg 
         viewBox="0 0 100 100" 
         className="w-full h-full overflow-visible"
-        style={{ filter: "drop-shadow(0 0 5px rgba(215, 125, 238, 0.6))" }} 
+        style={{ filter: "drop-shadow(0 0 8px rgba(215, 125, 238, 0.8))" }} 
       >
         <defs>
           <filter id="glow-noise">
@@ -42,20 +45,23 @@ const TribalLetter = ({ char }) => {
           </filter>
         </defs>
 
+        {/* PRIMARY STROKE (Changed to lighter color for visibility) */}
         <path 
           d={path} 
           fill="transparent" 
-          stroke="#1a0827" 
-          strokeWidth="3"
+          stroke="#d77dee" 
+          strokeWidth="2.5"
           strokeLinecap="round"
           strokeLinejoin="round"
           filter="url(#glow-noise)"
         />
+        
+        {/* SHADOW STROKE */}
         <path 
           d={path} 
           fill="transparent" 
-          stroke="rgba(0,0,0,0.5)" 
-          strokeWidth="0.5"
+          stroke="rgba(0,0,0,0.8)" 
+          strokeWidth="1"
         />
       </svg>
     </div>
@@ -69,14 +75,15 @@ const SideTypography = ({ isFirstPage }) => {
   useLayoutEffect(() => {
     const ctx = gsap.context(() => {
       if (isFirstPage) {
+        // Entry Animation
         gsap.to(containerRef.current, {
           x: 0,
           opacity: 1,
           duration: 1.2,
           ease: "power4.out",
-          delay: 0.5
         });
 
+        // Letter Stagger Entry
         gsap.fromTo(".tribal-char", 
           { scale: 0, rotation: -90, opacity: 0 },
           { 
@@ -86,10 +93,11 @@ const SideTypography = ({ isFirstPage }) => {
             duration: 0.8, 
             stagger: 0.1,
             ease: "back.out(2)",
-            delay: 0.8
+            delay: 0.2
           }
         );
         
+        // Continuous Floating Animation
         gsap.to(".tribal-char", {
             y: "random(-10, 10)", 
             rotation: "random(-5, 5)",
@@ -99,18 +107,8 @@ const SideTypography = ({ isFirstPage }) => {
             ease: "sine.inOut",
             stagger: { each: 0.2, from: "random" }
         });
-
-        gsap.to(".tribal-char", {
-            skewX: "random(-20, 20)",
-            duration: 0.1,
-            repeat: -1,
-            repeatDelay: "random(2, 5)",
-            yoyo: true,
-            ease: "power1.inOut",
-            stagger: { each: 0.5, from: "random" }
-        });
-
       } else {
+        // Exit Animation
         gsap.to(containerRef.current, {
           x: 100,
           opacity: 0,
@@ -125,8 +123,8 @@ const SideTypography = ({ isFirstPage }) => {
   return (
     <div 
       ref={containerRef}
-      // ✅ ADDED 'hidden md:flex': This hides the component on mobile, shows it on desktop
-      className="fixed top-0 right-[10vw] h-screen hidden md:flex flex-col justify-center items-center z-20 pointer-events-none opacity-0 translate-x-20"
+      // CHANGED: z-[1001] -> z-[55] to be below transitions but above content
+      className="fixed top-0 right-[5vw] h-screen hidden md:flex flex-col justify-center items-center z-[55] pointer-events-none translate-x-20 opacity-0"
     >
       <div className="flex flex-col items-center gap-3">
         {['A','H','O','U','B','A'].map((char, i) => (
@@ -222,11 +220,14 @@ function App() {
   useEffect(() => {
     const handleScroll = () => {
       const scrollY = window.scrollY;
-      const fadeOutPoint = window.innerHeight * 2; 
-      setIsFirstPage(scrollY < fadeOutPoint);
+      // Fade out when scrolling past the first screen height
+      setIsFirstPage(scrollY < window.innerHeight * 2.3); 
     };
     
     window.addEventListener("scroll", handleScroll);
+    // Initial check
+    handleScroll();
+    
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
@@ -239,8 +240,9 @@ function App() {
         <div ref={transitionRefs.t2} className="h-[300vh]" />
         <div id="space-trigger" className="h-[150vh] bg-transparent" />
         <div ref={transitionRefs.t3} className="h-[300vh]" />
+        <div className="h-[100vh]" />
         <div ref={transitionRefs.t4} className="h-[300vh]" />
-        <div className="h-screen" /> 
+        <div className="h-[100vh]" /> 
       </div>
 
       <div className="fixed inset-0 w-full h-screen overflow-hidden pointer-events-none">
@@ -254,7 +256,7 @@ function App() {
            <OverlayMenu isOpen={isMenuOpen} closeMenu={closeMenu} />
         </div>
 
-        {/* ✅ ANIMATED & HOLLOW TYPOGRAPHY (Hidden on Mobile) */}
+        {/* ✅ ANIMATED & HOLLOW TYPOGRAPHY */}
         <SideTypography isFirstPage={isFirstPage} />
 
         {/* --- PAGES --- */}
@@ -264,6 +266,7 @@ function App() {
         <PageWrapper sectionRef={sectionRefs.summer}><SummerSection /></PageWrapper>
         <PageWrapper sectionRef={sectionRefs.autumn}><AutumnSection /></PageWrapper>
 
+        {/* --- TRANSITIONS --- */}
         <FracturedParallelogramTransition color1="#2e1a3e" triggerRef={transitionRefs.t1} nextSectionRef={sectionRefs.spring} />
         <FracturedParallelogramTransition color1="#050b14" triggerRef={transitionRefs.t2} nextSectionRef={sectionRefs.space} />
         <FracturedParallelogramTransition color1="#f8bbd0" triggerRef={transitionRefs.t3} nextSectionRef={sectionRefs.summer} />

@@ -18,6 +18,8 @@ const OverlayMenu = ({ isOpen, closeMenu }) => {
   
   const tlRef = useRef(null); 
 
+ 
+
   const menuLinks = [
     { id: "01", label: "HOME", link: "/" },
     { id: "02", label: "ALL EVENTS", link: "/events" },
@@ -41,6 +43,7 @@ const OverlayMenu = ({ isOpen, closeMenu }) => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  
   // --- NOTIFICATION ANIMATION ---
   useLayoutEffect(() => {
     if (!notificationBoxRef.current) return;
@@ -133,7 +136,7 @@ const OverlayMenu = ({ isOpen, closeMenu }) => {
     }, notificationRef);
 
     return () => ctx.revert();
-  }, [isExpanded,isFirstPage]);
+  }, [isFirstPage,isExpanded]);
 
   // --- MENU ANIMATION ---
   useLayoutEffect(() => {
@@ -223,7 +226,7 @@ const OverlayMenu = ({ isOpen, closeMenu }) => {
       {isFirstPage && (
         <div 
           ref={notificationRef}
-          className="absolute top-[70vh] left-[14vw] md:left-25 md:top-80 z-20 font-sans scale-x-110 md:opacity-100"
+          className="absolute top-[70vh] left-[6vw] md:left-[6vw]  md:left-25 md:top-90 z-20 font-sans scale-x-110 md:opacity-100"
         >
           <div 
             ref={notificationBoxRef} 
