@@ -1,8 +1,8 @@
 import React, { useRef, useLayoutEffect } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import gndm from "./assets/gndm.png";
-import eva from "./assets/wintertree.png";
+import gndm from "../assets/gndm.png";
+import eva from "../assets/wintertree.png";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -167,7 +167,7 @@ const SecondSection = () => {
         </div>
       </div>
       
-      <style jsx="true">{`
+      <style jsx={true}>{`
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
       `}</style>

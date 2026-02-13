@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef, useLayoutEffect } from "react";
 import gsap from "gsap";
-import sideCharacter from "./assets/overlaySideCharacter.png";
+// FIX: Changed ./assets to ../assets
+import sideCharacter from "../assets/overlaySideCharacter.png";
 
 const OverlayMenu = ({ isOpen, closeMenu }) => {
   const containerRef = useRef(null);
@@ -11,14 +12,12 @@ const OverlayMenu = ({ isOpen, closeMenu }) => {
   // Notification Refs
   const notificationRef = useRef(null); 
   const notificationBoxRef = useRef(null);
-  const toggleBtnRef = useRef(null); // ✅ NEW REF for the button
+  const toggleBtnRef = useRef(null);
   
   const [isFirstPage, setIsFirstPage] = useState(true);
   const [isExpanded, setIsExpanded] = useState(true);
   
   const tlRef = useRef(null); 
-
- 
 
   const menuLinks = [
     { id: "01", label: "HOME", link: "/" },
@@ -53,8 +52,6 @@ const OverlayMenu = ({ isOpen, closeMenu }) => {
 
       if (isExpanded) {
         // --- OPEN SEQUENCE ---
-        
-        // 1. Expand Box
         tl.to(notificationBoxRef.current, {
           width: 380, 
           height: "auto", 
@@ -65,24 +62,19 @@ const OverlayMenu = ({ isOpen, closeMenu }) => {
           duration: 0.6,
           ease: "back.out(1.2)"
         })
-        
-        // 2. Move Button to Top-Left (Padding position)
         .to(toggleBtnRef.current, {
-            top: "24px",   // Matches p-6 (24px)
-            left: "24px",  // Matches p-6 (24px)
-            xPercent: 0,   // Reset centering
-            yPercent: 0,   // Reset centering
+            top: "24px",
+            left: "24px",
+            xPercent: 0,
+            yPercent: 0,
             duration: 0.5,
             ease: "power2.inOut"
         }, "<")
-
-        // 3. Scanline
         .fromTo(".scanline", 
           { top: "-10%", opacity: 1 },
           { top: "110%", opacity: 0, duration: 0.5, ease: "power1.in" },
           "-=0.4"
         )
-        // 4. Content
         .to(".content-wrapper", {
           opacity: 1,
           visibility: "visible",
@@ -102,14 +94,10 @@ const OverlayMenu = ({ isOpen, closeMenu }) => {
 
       } else {
         // --- CLOSE SEQUENCE ---
-        
-        // 1. Hide Content
         tl.to([".content-wrapper", ".decorations"], {
           opacity: 0,
           duration: 0.2
         })
-        
-        // 2. Shrink Box
         .to(notificationBoxRef.current, {
           width: 50, 
           height: 50,
@@ -120,9 +108,6 @@ const OverlayMenu = ({ isOpen, closeMenu }) => {
           duration: 0.4,
           ease: "power3.inOut"
         }, "<")
-        
-        // 3. Move Button to Dead Center
-        // We use top/left 50% + x/yPercent -50% for perfect centering regardless of size
         .to(toggleBtnRef.current, {
             top: "50%",
             left: "50%",
@@ -244,23 +229,17 @@ const OverlayMenu = ({ isOpen, closeMenu }) => {
               ></div>
             </div>
 
-            {/* INNER CONTAINER: Added explicit padding (p-6) so text aligns correctly */}
             <div className="relative p-6 flex flex-col w-full h-full">
-              
               <div className="flex items-center w-full">
-                
-                {/* TOGGLE BUTTON - ABSOLUTE POSITIONED via GSAP */}
-                {/* We removed 'relative/absolute' classes here to let GSAP handle it fully */}
                 <div 
                   ref={toggleBtnRef}
                   onClick={() => setIsExpanded(!isExpanded)}
                   className="absolute flex items-center justify-center w-[30px] h-[30px] md:w-8 md:h-8 rounded-full border border-[#00F3FF] text-[#00F3FF] shadow-[0_0_10px_rgba(0,243,255,0.4)] cursor-pointer hover:bg-[#00F3FF] hover:text-black transition-colors duration-300 z-[60] bg-black/40"
-                  style={{ top: "24px", left: "24px" }} // Default Open Position
+                  style={{ top: "24px", left: "24px" }}
                 >
                   <span className="text-lg font-bold select-none leading-none pt-[1px]">!</span>
                 </div>
 
-                {/* TITLE CONTAINER - Added ml-12 to push text away from the absolute button */}
                 <div className="content-wrapper opacity-0 invisible w-full overflow-hidden ml-12">
                     <div className="title-text border-b border-[#00F3FF]/20 pb-2 w-full">
                         <h2 className="text-[#00F3FF] tracking-[0.2em] text-lg font-bold drop-shadow-[0_0_5px_rgba(0,243,255,0.8)] whitespace-nowrap">
@@ -295,7 +274,6 @@ const OverlayMenu = ({ isOpen, closeMenu }) => {
         </div> 
       )}
 
-      {/* CHARACTER & MENU (Unchanged) */}
       <div
         ref={characterRef}
         className="fixed md:bottom-0 left-[-6.5vw] z-300 w-[50vw] md:w-[30vw] bottom-85 h-auto pointer-events-none origin-bottom opacity-0"
