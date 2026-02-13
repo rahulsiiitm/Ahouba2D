@@ -145,7 +145,7 @@ const SummerSection = () => {
   };
 
   return (
-    <div ref={sectionRef} className="relative w-full h-screen overflow-hidden flex items-center justify-center px-4 md:px-10">
+    <div ref={sectionRef} className="relative w-full min-h-screen overflow-hidden flex items-center justify-center px-4 md:px-10 py-20 md:py-0">
       
       {/* 1. BACKGROUND GRADIENT */}
       <div className="absolute inset-0 bg-gradient-to-b from-[#fff9e6] via-[#ffe0b2] to-[#ffcc80] -z-20"></div>
@@ -197,12 +197,10 @@ const SummerSection = () => {
       </div>
 
       {/* 4. MAIN CONTENT CONTAINER - SHIFTED LAYOUT */}
-      {/* Changed: max-w to 95%, justify-between pushes items to edges */}
-      <div className="relative z-10 flex flex-col md:flex-row w-full max-w-[95%] h-[85vh] gap-25 justify-center items-center">
+      <div className="relative z-10 flex flex-col md:flex-row w-full max-w-[95%] h-full md:h-[85vh] gap-6 md:gap-12 justify-center items-center">
         
-        {/* --- LEFT SIDE: MENU LIST --- */}
-        {/* Changed: Width to 30%, added padding-left (md:pl-10) to shift visually left */}
-        <div className="flex flex-col justify-center gap-4 w-full md:w-[30%] h-full z-20 select-none md:pl-10">
+        {/* --- LEFT SIDE: MENU LIST (Moves to Bottom on Mobile via order-2) --- */}
+        <div className="order-2 md:order-1 flex flex-col justify-center gap-3 md:gap-4 w-full md:w-[30%] z-20 select-none md:pl-10">
           {data.map((item, i) => {
             const isActive = activeIndex === i;
 
@@ -210,13 +208,13 @@ const SummerSection = () => {
               <div key={item.id} className="side-item-wrapper"> 
                 <div
                     onClick={() => handleItemClick(i)}
-                    className={`group relative cursor-pointer p-4 rounded-2xl border transition-all duration-300 ease-out flex items-center gap-5 backdrop-blur-md
+                    className={`group relative cursor-pointer p-3 md:p-4 rounded-xl md:rounded-2xl border transition-all duration-300 ease-out flex items-center gap-4 md:gap-5 backdrop-blur-md
                     ${isActive 
-                        ? "bg-white/90 border-orange-500 scale-105 shadow-2xl z-30 translate-x-4 ring-2 ring-orange-400/30" 
+                        ? "bg-white/90 border-orange-500 md:scale-105 shadow-2xl z-30 md:translate-x-4 translate-x-2 ring-2 ring-orange-400/30" 
                         : "bg-white/20 border-white/30 hover:bg-white/40 hover:scale-105 hover:shadow-lg hover:border-orange-200 hover:translate-x-2"
                     }`}
                 >
-                    <div className={`w-12 h-12 rounded-full flex items-center justify-center font-black text-xl flex-shrink-0 transition-all duration-300
+                    <div className={`w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center font-black text-lg md:text-xl flex-shrink-0 transition-all duration-300
                     ${isActive 
                         ? "bg-orange-500 text-white shadow-md scale-110" 
                         : "bg-white/40 text-orange-900/40 group-hover:bg-orange-400 group-hover:text-white group-hover:scale-110"
@@ -225,18 +223,18 @@ const SummerSection = () => {
                     </div>
                     
                     <div className="flex flex-col overflow-hidden">
-                        <h4 className={`font-bold text-sm uppercase tracking-wider transition-colors duration-300
+                        <h4 className={`font-bold text-xs md:text-sm uppercase tracking-wider transition-colors duration-300
                             ${isActive ? "text-orange-800" : "text-orange-900/50 group-hover:text-orange-800"}`}>
                             {item.title}
                         </h4>
-                        <span className={`text-[10px] font-semibold uppercase tracking-tight transition-colors duration-300
+                        <span className={`text-[9px] md:text-[10px] font-semibold uppercase tracking-tight transition-colors duration-300
                             ${isActive ? "text-orange-600" : "text-orange-900/30 group-hover:text-orange-600"}`}>
                             {item.desc}
                         </span>
                     </div>
 
                     {isActive && (
-                        <div className="absolute right-4 top-1/2 -translate-y-1/2">
+                        <div className="absolute right-4 top-1/2 -translate-y-1/2 hidden sm:block">
                             <span className="relative flex h-3 w-3">
                               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75"></span>
                               <span className="relative inline-flex rounded-full h-3 w-3 bg-orange-500"></span>
@@ -249,18 +247,19 @@ const SummerSection = () => {
           })}
         </div>
 
-        {/* --- RIGHT SIDE: DISPLAY --- */}
-        {/* Changed: Width to 65%, added padding-right (md:pr-10) to shift visually right */}
-        <div className="w-full md:w-[55%] h-full flex items-center justify-center z-10 md:pr-10">
+        {/* --- RIGHT SIDE: DISPLAY (Moves to Top on Mobile via order-1) --- */}
+        {/* ADDED mt-8 md:mt-0 to explicitly push down from the top edge/navbar on mobile */}
+        <div className="order-1 md:order-2 w-full md:w-[55%] flex items-center justify-center z-10 md:pr-10 mt-8 md:mt-0">
           <div
             ref={bigDivRef}
-            className="relative w-full h-[60vh] md:h-[70vh] bg-white/40 backdrop-blur-xl rounded-[3rem] border border-white/40 shadow-xl p-8 md:p-12 flex flex-col justify-center overflow-hidden select-text"
+            /* REDUCED height from 45vh to 42vh on mobile */
+            className="relative w-full h-[42vh] md:h-[70vh] bg-white/40 backdrop-blur-xl rounded-[2rem] md:rounded-[3rem] border border-white/40 shadow-xl p-6 md:p-12 flex flex-col justify-center overflow-hidden select-text"
           >
             {/* Background Bloom */}
             <div className="absolute -top-20 -right-20 w-80 h-80 bg-orange-400/20 rounded-full blur-[100px] pointer-events-none"></div>
 
             {/* --- IMAGE CONTAINER --- */}
-            <div className="absolute top-6 right-6 md:top-10 md:right-10 w-32 h-32 md:w-64 md:h-64 rounded-full border-2 border-orange-500/20 shadow-lg overflow-hidden z-20 pointer-events-none">
+            <div className="absolute top-4 right-4 md:top-10 md:right-10 w-24 h-24 md:w-64 md:h-64 rounded-full border-2 border-orange-500/20 shadow-lg overflow-hidden z-20 pointer-events-none">
                 <img 
                     src={data[activeIndex].img} 
                     alt={data[activeIndex].title} 
@@ -268,23 +267,23 @@ const SummerSection = () => {
                 />
             </div>
 
-            <div className="relative z-10">
-              <div className="flex items-center gap-3 mb-6 opacity-80 select-none">
-                <span className="w-8 h-[3px] bg-orange-500"></span>
-                <span className="text-orange-800 font-bold tracking-[0.3em] uppercase text-xs">System Data // {data[activeIndex].id}</span>
+            <div className="relative z-10 mt-8 md:mt-0">
+              <div className="flex items-center gap-2 md:gap-3 mb-4 md:mb-6 opacity-80 select-none">
+                <span className="w-6 md:w-8 h-[2px] md:h-[3px] bg-orange-500"></span>
+                <span className="text-orange-800 font-bold tracking-[0.2em] md:tracking-[0.3em] uppercase text-[10px] md:text-xs">System Data // {data[activeIndex].id}</span>
               </div>
 
-              <h2 className="text-5xl md:text-7xl font-black text-transparent bg-clip-text bg-gradient-to-br from-orange-600 to-orange-900 mb-6 uppercase leading-tight drop-shadow-sm selection:bg-orange-200 selection:text-orange-900">
+              <h2 className="text-3xl sm:text-4xl md:text-7xl font-black text-transparent bg-clip-text bg-gradient-to-br from-orange-600 to-orange-900 mb-4 md:mb-6 uppercase leading-tight drop-shadow-sm selection:bg-orange-200 selection:text-orange-900">
                 {data[activeIndex].title}
               </h2>
               
-              <p className="text-lg md:text-2xl text-gray-800 leading-relaxed font-medium border-l-4 border-orange-400/50 pl-6 py-2 italic selection:bg-orange-200 selection:text-orange-900">
+              <p className="text-sm sm:text-base md:text-2xl text-gray-800 leading-relaxed font-medium border-l-4 border-orange-400/50 pl-4 md:pl-6 py-1 md:py-2 italic selection:bg-orange-200 selection:text-orange-900">
                 {data[activeIndex].bio}
               </p>
             </div>
 
-            <div className="absolute bottom-10 right-10 opacity-30 pointer-events-none select-none">
-                <div className="text-[10px] font-mono text-orange-900 tracking-widest">SECURE_CONNECTION_ESTABLISHED</div>
+            <div className="absolute bottom-6 right-6 md:bottom-10 md:right-10 opacity-30 pointer-events-none select-none">
+                <div className="text-[8px] md:text-[10px] font-mono text-orange-900 tracking-widest">SECURE_CONNECTION</div>
             </div>
           </div>
         </div>

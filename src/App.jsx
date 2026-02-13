@@ -160,7 +160,7 @@ const AnimatedWaveFooter = memo(({ triggerRef }) => {
           </ul>
 
           <p className="text-white font-[300] text-[0.9rem] md:text-[1rem] mt-[15px] mb-[10px] opacity-75 text-center">
-            &copy;2026 Sahil | All Rights Reserved
+            &copy;2026 AHOUBA | All Rights Reserved
           </p>
         </div>
 
@@ -294,7 +294,7 @@ function App() {
         <PageWrapper sectionRef={sectionRefs.autumn}><AutumnSection /></PageWrapper>
 
         {/* --- TRANSITIONS --- */}
-        <FracturedParallelogramTransition color1="#2e1a3e" triggerRef={transitionRefs.t1} nextSectionRef={sectionRefs.spring} />
+        <FracturedParallelogramTransition color1="#160E1E" triggerRef={transitionRefs.t1} nextSectionRef={sectionRefs.spring} />
         <FracturedParallelogramTransition color1="#0b1b33" triggerRef={transitionRefs.t2} nextSectionRef={sectionRefs.space} />
         <FracturedParallelogramTransition color1="#ffe0b2" triggerRef={transitionRefs.t3} nextSectionRef={sectionRefs.summer} />
         <FracturedParallelogramTransition color1="#bcaaa4" triggerRef={transitionRefs.t4} nextSectionRef={sectionRefs.autumn} />

@@ -185,7 +185,7 @@ const AutumnSection = () => {
         
         {/* Title */}
         <div className="absolute top-8 md:top-12 text-center z-40">
-            <h2 className="text-orange-900/90 tracking-[0.4em] text-xs md:text-sm font-black uppercase drop-shadow-sm">Autumn Collection</h2>
+            <h2 className="text-orange-900/90 tracking-[0.4em] text-xs md:text-sm font-black uppercase drop-shadow-sm">SPONSOR SECTION</h2>
         </div>
 
         {/* Carousel Container */}
