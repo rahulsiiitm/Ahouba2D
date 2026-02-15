@@ -1,24 +1,25 @@
 import React, { useState, useRef, useCallback, memo, useEffect } from 'react';
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
 
 // --- EXTERNAL COMPONENTS ---
-// Make sure these paths match where you actually moved the files
-import Navbar from './components/-1NavBar';
-import GlitchMenu from './components/-1GlitchMenu';
-import OverlayMenu from './components/-1OverlayMenu';
-import SpringSection from './components/2SpringSection.jsx';
-import SummerSection from './components/4SummerSection.jsx'; 
-import AutumnSection from './components/5AutumnSection.jsx';
-import SecondSection from './components/3WinterSection.jsx';
-import FracturedParallelogramTransition from './components/-1PageTransition.jsx'; 
-import Gatekeeper from './components/0Gatekeeper.jsx';
-import GokuPage, { SideTypography } from './components/1GokuPage.jsx';
-import AnimatedWaveFooter from './components/6Footer.jsx'; 
+import Navbar from './LandingPageComponents/-1NavBar';
+import GlitchMenu from './LandingPageComponents/-1GlitchMenu';
+import OverlayMenu from './LandingPageComponents/-1OverlayMenu';
+import SpringSection from './LandingPageComponents/2SpringSection.jsx';
+import SummerSection from './LandingPageComponents/4SummerSection.jsx'; 
+import AutumnSection from './LandingPageComponents/5AutumnSection.jsx';
+import SecondSection from './LandingPageComponents/3WinterSection.jsx';
+import FracturedParallelogramTransition from './LandingPageComponents/-1PageTransition.jsx'; 
+import Gatekeeper from './LandingPageComponents/0Gatekeeper.jsx';
+import GokuPage, { SideTypography } from './LandingPageComponents/1GokuPage.jsx';
+import AnimatedWaveFooter from './LandingPageComponents/6Footer.jsx'; 
+import EventPage from './OtherPages/EventPage.jsx';
 
 gsap.registerPlugin(ScrollTrigger);
 
-// --- APP PAGES HELPERS ---
+// --- HELPER COMPONENTS ---
 const fixedPageStyle = {
   position: 'fixed', inset: 0, width: '100%', height: '100vh',
   willChange: 'opacity, transform', transform: 'translateZ(0)', backfaceVisibility: 'hidden',
@@ -34,36 +35,14 @@ const PageWrapper = memo(({ sectionRef, children }) => (
   <div ref={sectionRef} style={{ ...fixedPageStyle, zIndex: 1, opacity: 0 }}>{children}</div>
 ));
 
-// --- MAIN APP COMPONENT ---
-function App() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+// --- LANDING PAGE COMPONENT ---
+const LandingPage = () => {
   const [isFirstPage, setIsFirstPage] = useState(true);
-  
-  // FIX: Check session storage IMMEDIATELY to prevent "Flash" on refresh
-  const [showGate, setShowGate] = useState(() => {
-    return !sessionStorage.getItem('ahouba_gate_passed');
-  });
+  const [showGate, setShowGate] = useState(() => !sessionStorage.getItem('ahouba_gate_passed'));
   
   const PARENT = useRef(null);
-
-  const transitionRefs = {
-    t1: useRef(null), 
-    t2: useRef(null), 
-    t3: useRef(null), 
-    t4: useRef(null),
-    t5: useRef(null), 
-  };
-
-  const sectionRefs = {
-    goku: useRef(null), 
-    space: useRef(null), 
-    spring: useRef(null), 
-    summer: useRef(null), 
-    autumn: useRef(null),
-  };
-
-  const toggleMenu = useCallback(() => setIsMenuOpen(v => !v), []);
-  const closeMenu = useCallback(() => setIsMenuOpen(false), []);
+  const transitionRefs = { t1: useRef(null), t2: useRef(null), t3: useRef(null), t4: useRef(null), t5: useRef(null) };
+  const sectionRefs = { goku: useRef(null), space: useRef(null), spring: useRef(null), summer: useRef(null), autumn: useRef(null) };
 
   const handleSelect = (mode) => {
     if (mode === '3d') {
@@ -81,7 +60,6 @@ function App() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Early return for Gatekeeper
   if (showGate) return <Gatekeeper onSelect={handleSelect} />;
 
   return (
@@ -103,15 +81,6 @@ function App() {
       {/* VISUAL LAYERS */}
       <div className="fixed inset-0 w-full h-screen overflow-hidden pointer-events-none">
         
-        <div className="fixed top-0 left-0 right-0 z-[1000] pointer-events-auto">
-          <Navbar toggleMenu={toggleMenu} />
-          <GlitchMenu onClick={toggleMenu} isOpen={isMenuOpen} />
-        </div>
-
-        <div className="pointer-events-auto">
-           <OverlayMenu isOpen={isMenuOpen} closeMenu={closeMenu} />
-        </div>
-
         <SideTypography isFirstPage={isFirstPage} />
         
         {/* PAGES */}
@@ -123,7 +92,6 @@ function App() {
         
         <SpacePage sectionRef={sectionRefs.space} parent={PARENT} />
         
-        {/* Make sure you use the UPDATED SummerSection code I gave you to fix the scaling! */}
         <PageWrapper sectionRef={sectionRefs.summer}>
             <SummerSection globalTriggerRef={transitionRefs.t3} />
         </PageWrapper>
@@ -142,6 +110,49 @@ function App() {
 
       </div>
     </>
+  );
+};
+
+// --- SCROLL RESET HELPER ---
+const ScrollToTop = () => {
+  const { pathname } = useLocation();
+  useEffect(() => {
+    window.scrollTo(0, 0);
+    ScrollTrigger.refresh();
+  }, [pathname]);
+  return null;
+};
+
+// --- MAIN APP COMPONENT ---
+function App() {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const toggleMenu = useCallback(() => setIsMenuOpen(v => !v), []);
+  const closeMenu = useCallback(() => setIsMenuOpen(false), []);
+
+  return (
+    <Router>
+      <ScrollToTop />
+      
+      {/* ✅ NAVBAR & BUTTON CONTAINER: z-[1000] */}
+      <div className="fixed top-0 left-0 right-0 z-[1000] pointer-events-auto">
+        <Navbar toggleMenu={toggleMenu} />
+        <GlitchMenu onClick={toggleMenu} isOpen={isMenuOpen} />
+      </div>
+
+      {/* ✅ OVERLAY MENU CONTAINER: CHANGED to z-[999] */}
+      {/* Use 999 so it is definitely BELOW the Navbar (1000) but ABOVE page content */}
+      <div className="fixed inset-0 z-[999] pointer-events-none">
+         <div className="pointer-events-auto">
+            <OverlayMenu isOpen={isMenuOpen} closeMenu={closeMenu} />
+         </div>
+      </div>
+
+      <Routes>
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/events" element={<EventPage />} />
+      </Routes>
+    </Router>
   );
 }
 
