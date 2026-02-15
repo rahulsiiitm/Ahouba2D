@@ -1,15 +1,17 @@
 import React, { useEffect, useRef } from "react";
 import gsap from "gsap";
 
-const Navbar = () => {
+const Navbar = ({ toggleMenu }) => {
   const navRef = useRef(null);
   const lastScrollY = useRef(0);
 
+  // ✅ Links matching the IDs in App.js
   const navItems = [
-    { name: "EVENTS", link: "#events" },
-    { name: "ABOUT", link: "#about" },
-    { name: "PEOPLE", link: "#people" },
-    { name: "MONSTER", link: "#timeline" },
+    { name: "HOME", link: "#home" },         // Goes to Top
+    { name: "ABOUT", link: "#about" },       // Goes to Spring Section
+    { name: "EVENTS", link: "#events" },     // Goes to Winter/Space Section
+    { name: "PEOPLE", link: "#people" },     // Goes to Summer Section
+    { name: "SPONSORS", link: "#sponsors" }, // Goes to Autumn Section
   ];
 
   useEffect(() => {
@@ -39,18 +41,19 @@ const Navbar = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  // ✅ Smooth Scroll Handler
+  const handleNavClick = (e, targetId) => {
+    e.preventDefault();
+    const element = document.querySelector(targetId);
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  };
+
   return (
-    // WRAPPER
-    // Added a subtle "Glitch Blue" drop shadow to the whole container
     <div className="fixed top-0 left-0 w-full flex justify-center z-50 pointer-events-none drop-shadow-[0_0_15px_rgba(113,34,250,0.5)]">
-      
-      {/* NAVBAR CONTAINER */}
       <nav
         ref={navRef}
-        // COLOR PALETTE APPLIED:
-        // bg-[#1A0B2E]/90: Deep Purple background (90% opacity)
-        // border-b-4 border-[#FF007A]: Thick "Laser Pink" bottom border (Very Promare style)
-        // shadow-[...]: Pink glow under the border
         className="pointer-events-auto md:w-[75%] md:h-19 h-20 relative w-[85%]    
                    bg-[#1A0B2E]/90 backdrop-blur-md 
                    border-b-4 border-[#FF007A]
@@ -63,10 +66,7 @@ const Navbar = () => {
             <li key={index}>
               <a
                 href={item.link}
-                // TEXT STYLING:
-                // text-white: Stark White text for maximum contrast
-                // hover:text-[#F0F600]: "Warning Yellow" on hover
-                // hover:drop-shadow-[...]: Yellow neon glow on hover
+                onClick={(e) => handleNavClick(e, item.link)} // ✅ Attach Handler
                 className="text-white text-xl font-['Orbitron'] font-bold tracking-[0.2em] cursor-pointer 
                            block transition-all duration-200 ease-out
                            hover:text-[#F0F600] hover:scale-110 

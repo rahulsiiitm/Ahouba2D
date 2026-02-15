@@ -36,20 +36,20 @@ const PageWrapper = memo(({ sectionRef, children }) => (
 ));
 
 // --- LANDING PAGE COMPONENT ---
-const LandingPage = () => {
+const LandingPage = ({ gatePassed, setGatePassed }) => {
   const [isFirstPage, setIsFirstPage] = useState(true);
-  const [showGate, setShowGate] = useState(() => !sessionStorage.getItem('ahouba_gate_passed'));
   
   const PARENT = useRef(null);
   const transitionRefs = { t1: useRef(null), t2: useRef(null), t3: useRef(null), t4: useRef(null), t5: useRef(null) };
   const sectionRefs = { goku: useRef(null), space: useRef(null), spring: useRef(null), summer: useRef(null), autumn: useRef(null) };
 
+  // Handle Gatekeeper logic
   const handleSelect = (mode) => {
     if (mode === '3d') {
       window.location.href = 'https://3d.ahouba.com';
     } else {
       sessionStorage.setItem('ahouba_gate_passed', 'true');
-      setShowGate(false);
+      setGatePassed(true);
     }
   };
 
@@ -60,42 +60,78 @@ const LandingPage = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  if (showGate) return <Gatekeeper onSelect={handleSelect} />;
+  // If gate not passed, show Gatekeeper and NOTHING else
+  if (!gatePassed) return <Gatekeeper onSelect={handleSelect} />;
 
   return (
     <>
-      {/* SCROLL TRACKER */}
+      {/* --- SCROLL TRACKER (INVISIBLE LAYOUT) --- 
+          This defines the scroll height and navigation anchors. 
+          IDs are positioned absolutely to avoid layout shifts (glitches).
+      */}
       <div ref={PARENT} className="relative w-full" style={{ height: 'auto', minHeight: '1200vh' }}>
-        <div className="h-screen" /> 
-        <div ref={transitionRefs.t1} className="h-[300vh]" />
-        <div className="h-[100vh]" />
-        <div ref={transitionRefs.t2} className="h-[300vh]" />
-        <div id="space-trigger" className="h-[150vh] bg-transparent" />
-        <div ref={transitionRefs.t3} className="h-[300vh]" />
-        <div className="h-[100vh]" />
-        <div ref={transitionRefs.t4} className="h-[300vh]" />
-        <div className="h-[250vh]" /> 
-        <div ref={transitionRefs.t5} className="h-[150vh]" />
+        
+        {/* 1. HOME */}
+        <div id="home" className="absolute top-0 w-full h-1 pointer-events-none" />
+        <div className="h-screen w-full" /> 
+
+        {/* TRANSITION 1 */}
+        <div ref={transitionRefs.t1} className="h-[300vh] w-full" />
+        
+        {/* 2. ABOUT (Spring Section) */}
+        <div id="about" className="absolute w-full h-1 pointer-events-none" style={{ top: '400vh' }} /> 
+        {/* The top value approx matches (100vh home + 300vh t1) */}
+        
+        <div className="h-[100vh] w-full" />
+
+        {/* TRANSITION 2 */}
+        <div ref={transitionRefs.t2} className="h-[300vh] w-full" />
+        
+        {/* 3. EVENTS (Winter/Space Section) */}
+        {/* ID placed on the space-trigger container */}
+        <div id="events" className="absolute w-full h-1 pointer-events-none" style={{ top: '800vh' }} />
+        <div id="space-trigger" className="h-[150vh] bg-transparent w-full" />
+        
+        {/* TRANSITION 3 */}
+        <div ref={transitionRefs.t3} className="h-[300vh] w-full" />
+        
+        {/* 4. PEOPLE (Summer Section) */}
+        <div id="people" className="absolute w-full h-1 pointer-events-none" style={{ top: '1250vh' }} />
+        <div className="h-[100vh] w-full" />
+
+        {/* TRANSITION 4 */}
+        <div ref={transitionRefs.t4} className="h-[300vh] w-full" />
+        
+        {/* 5. SPONSORS (Autumn Section) */}
+        <div id="sponsors" className="absolute w-full h-1 pointer-events-none" style={{ top: '1650vh' }} />
+        <div className="h-[250vh] w-full" /> 
+
+        {/* FOOTER TRANSITION */}
+        <div ref={transitionRefs.t5} className="h-[150vh] w-full" />
       </div>
 
-      {/* VISUAL LAYERS */}
+      {/* --- VISUAL LAYERS (FIXED POSITION) --- */}
       <div className="fixed inset-0 w-full h-screen overflow-hidden pointer-events-none">
         
         <SideTypography isFirstPage={isFirstPage} />
         
-        {/* PAGES */}
+        {/* 1. GOKU */}
         <GokuPage sectionRef={sectionRefs.goku} />
         
+        {/* 2. SPRING */}
         <PageWrapper sectionRef={sectionRefs.spring}>
             <SpringSection globalTriggerRef={transitionRefs.t1} />
         </PageWrapper>
         
+        {/* 3. SPACE/WINTER */}
         <SpacePage sectionRef={sectionRefs.space} parent={PARENT} />
         
+        {/* 4. SUMMER */}
         <PageWrapper sectionRef={sectionRefs.summer}>
             <SummerSection globalTriggerRef={transitionRefs.t3} />
         </PageWrapper>
         
+        {/* 5. AUTUMN */}
         <PageWrapper sectionRef={sectionRefs.autumn}>
             <AutumnSection globalTriggerRef={transitionRefs.t4} />
         </PageWrapper>
@@ -125,6 +161,11 @@ const ScrollToTop = () => {
 
 // --- MAIN APP COMPONENT ---
 function App() {
+  // ✅ STATE: Check session storage immediately
+  const [gatePassed, setGatePassed] = useState(() => {
+    return sessionStorage.getItem('ahouba_gate_passed') === 'true';
+  });
+  
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const toggleMenu = useCallback(() => setIsMenuOpen(v => !v), []);
@@ -134,22 +175,34 @@ function App() {
     <Router>
       <ScrollToTop />
       
-      {/* ✅ NAVBAR & BUTTON CONTAINER: z-[1000] */}
-      <div className="fixed top-0 left-0 right-0 z-[1000] pointer-events-auto">
-        <Navbar toggleMenu={toggleMenu} />
-        <GlitchMenu onClick={toggleMenu} isOpen={isMenuOpen} />
-      </div>
+      {/* ✅ CONDITION: Only render Navbar & Menu if Gate is Passed */}
+      {gatePassed && (
+        <>
+          {/* NAVBAR: z-[1000] */}
+          <div className="fixed top-0 left-0 right-0 z-[1000] pointer-events-auto">
+            <Navbar toggleMenu={toggleMenu} />
+            <GlitchMenu onClick={toggleMenu} isOpen={isMenuOpen} />
+          </div>
 
-      {/* ✅ OVERLAY MENU CONTAINER: CHANGED to z-[999] */}
-      {/* Use 999 so it is definitely BELOW the Navbar (1000) but ABOVE page content */}
-      <div className="fixed inset-0 z-[999] pointer-events-none">
-         <div className="pointer-events-auto">
-            <OverlayMenu isOpen={isMenuOpen} closeMenu={closeMenu} />
-         </div>
-      </div>
+          {/* OVERLAY MENU: z-[999] */}
+          <div className="fixed inset-0 z-[999] pointer-events-none">
+             <div className="pointer-events-auto">
+                <OverlayMenu isOpen={isMenuOpen} closeMenu={closeMenu} />
+             </div>
+          </div>
+        </>
+      )}
 
       <Routes>
-        <Route path="/" element={<LandingPage />} />
+        <Route 
+          path="/" 
+          element={
+            <LandingPage 
+              gatePassed={gatePassed} 
+              setGatePassed={setGatePassed} 
+            />
+          } 
+        />
         <Route path="/events" element={<EventPage />} />
       </Routes>
     </Router>
