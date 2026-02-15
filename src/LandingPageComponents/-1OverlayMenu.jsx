@@ -95,7 +95,6 @@ const OverlayMenu = ({ isOpen, closeMenu }) => {
       {/* CHARACTER */}
       <div
         ref={characterRef}
-        // ✅ FIXED: z-[39] is definitely lower than Navbar's z-50
         className="fixed md:bottom-0 left-[-6.5vw] z-[39] w-[50vw] md:w-[30vw] bottom-85 h-auto pointer-events-none origin-bottom opacity-0"
       >
         <img 
@@ -108,7 +107,6 @@ const OverlayMenu = ({ isOpen, closeMenu }) => {
       {/* MENU CONTAINER */}
       <div
         ref={containerRef}
-        // ✅ FIXED: z-[40] is definitely lower than Navbar's z-50
         className="fixed top-0 right-0 h-full w-full z-[40] 
                   bg-gradient-to-r from-[#1A0B2E] via-[#260a2e] to-[#4a0826]
                   translate-x-full shadow-[-10px_0_40px_rgba(255,0,122,0.3)]
@@ -152,11 +150,14 @@ const OverlayMenu = ({ isOpen, closeMenu }) => {
                            transition-all duration-300 ease-out cursor-pointer hover:translate-x-4"
                 style={{ WebkitTextStroke: "1px rgba(255,255,255,0.8)" }}
               >
-                <span className="text-lg md:text-2xl text-[#FF007A] font-medium tracking-widest border border-[#FF007A] px-2 py-1 
-                                 group-hover:bg-[#FF007A] group-hover:text-black transition-colors relative top-[4vh]">
+                {/* ✅ REMOVED "relative top-[4vh]" to shift text up */}
+                <span className="relative top-[2vh] text-lg md:text-2xl text-[#FF007A] font-medium tracking-widest border border-[#FF007A] px-2 py-1 
+                                 group-hover:bg-[#FF007A] group-hover:text-black transition-colors">
                   {item.id}
                 </span>
-                <span className="relative top-[4vh] inline-block group-hover:text-[#F0F600] group-hover:drop-shadow-[0_0_10px_rgba(240,246,0,0.8)] transition-colors duration-300">
+                
+                {/* ✅ REMOVED "relative top-[4vh]" to shift text up */}
+                <span className=" relative top-[2vh] inline-block group-hover:text-[#F0F600] group-hover:drop-shadow-[0_0_10px_rgba(240,246,0,0.8)] transition-colors duration-300">
                   {item.label}
                   <span className="absolute top-0 left-0 -translate-x-1 translate-y-1 text-[#00F3FF] opacity-0 group-hover:opacity-100 mix-blend-screen pointer-events-none">
                     {item.label}

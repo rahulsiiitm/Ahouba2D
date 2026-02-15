@@ -162,7 +162,7 @@ const YourNameSection = ({ globalTriggerRef }) => {
       </div>
 
       {/* --- TOP HEADING SECTION (Gap Decreased) --- */}
-      <div className="relative z-30 flex flex-col items-center mb-2"> 
+      <div className="relative z-30 flex flex-col items-center mt-5"> 
         <div className="heading-aurora-glow absolute -top-10 w-[300px] h-[100px] bg-[#ff007a]/40 blur-[70px] rounded-full pointer-events-none opacity-60"></div>
         <h1 className="text-white text-5xl md:text-7xl font-bold tracking-[0.05em] uppercase drop-shadow-[0_0_20px_rgba(255,255,255,0.3)]">
           Events
